@@ -1,11 +1,16 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { obtenerPersonal, eliminarPersonalUsuario, actualizarEstadoUsuario } from '../../api/ApiUsuarios/ApiUsuarios'
+import { FormularioUsuarioModal } from './FormularioUsuarioModal';
+import { Modal } from '../../components/Modal';
 
 export function ListaUsuarios() {
   const [personal, setPersonal] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
+
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [idEditar, setIdEditar] = useState(null);
 
   useEffect(() => {
     cargarPersonal()
@@ -22,6 +27,27 @@ export function ListaUsuarios() {
       setCargando(false)
     }
   }
+
+  function abrirModalCrear() {
+    setIdEditar(null);
+    setModalAbierto(true);
+  }
+
+  function abrirModalEditar(id) {
+    setIdEditar(id);
+    setModalAbierto(true);
+  }
+
+  function cerrarModal() {
+    setModalAbierto(false);
+    setIdEditar(null);
+  }
+
+  function manejarGuardado() {
+    cerrarModal();
+    cargarPersonal();
+  }
+
 
   async function manejarEliminacion(id) {
     if (confirm('¿Estas seguro de eliminar este usuario?')) {
@@ -57,7 +83,9 @@ export function ListaUsuarios() {
       <h1>Usuarios</h1>
 
       {/* Botón crear */}
-      <button><Link to="/usuarios/crear">Crear usuario</Link></button>
+      {/* <button><Link to="/usuarios/crear">Crear usuario</Link></button> */}
+      <button onClick={abrirModalCrear}>Crear usuario</button>
+
       <table border="1" cellPadding="8" cellSpacing="0" style={{ marginTop: "15px", width: "100%" }}>
         <thead>
           <tr>
@@ -69,8 +97,8 @@ export function ListaUsuarios() {
             <th>Fecha creacion</th>
             <th>Usuario</th>
             {/* <th>Rol</th> */}
-            <th>Acciones</th>
             <th>Estado</th>
+            <th>Acciones</th>
           </tr>
         </thead>
 
@@ -82,15 +110,13 @@ export function ListaUsuarios() {
               <td>{per.dni_per}</td>
               <td>{per.telefono_per}</td>
               <td>{per.correo_elect_per}</td>
-              <td>
-                {new Date(per.fecha_crea_per).toLocaleDateString('es-ES')}
-              </td>
+              <td>{new Date(per.fecha_crea_per).toLocaleDateString('es-ES')}</td>
               <td>{per.nombre_usuario}</td>
-              <td>
+              {/* <td> */}
                 {/* <button><Link to={`/usuarios/${per.id_personal}/detalles`}>Detalles</Link></button>{" | "} */}
-                <button><Link to={`/usuarios/${per.id_personal}/editar`}>Editar</Link> </button>{" | "}
-                <button onClick={() => manejarEliminacion(per.id_personal)}>Eliminar</button>
-              </td>
+                {/* <button><Link to={`/usuarios/${per.id_personal}/editar`}>Editar</Link> </button>{" | "} */}
+                {/* <button onClick={() => manejarEliminacion(per.id_personal)}>Eliminar</button> */}
+              {/* </td> */}
               <td>
                 <label>
                   <input 
@@ -111,10 +137,27 @@ export function ListaUsuarios() {
                   Inactivo
                 </label>
               </td>
+              <td>
+                <button onClick={()=>abrirModalEditar(per.id_personal)}>Editar</button>{" | "}
+                <button onClick={()=>manejarEliminacion(per.id_personal)}>Eliminar</button>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+      {/* Modal */}
+          <Modal
+            isOpen={modalAbierto}
+            onCancelar={cerrarModal}
+            titulo={idEditar ? "Editar Usuario" : "Crear Usuario"}
+          >
+            <FormularioUsuarioModal
+              id={idEditar}
+              onGuardar={manejarGuardado}
+              onCancelar={cerrarModal}
+            />
+          </Modal>
+
     </>
   );
 }
