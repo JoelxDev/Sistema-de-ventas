@@ -1,8 +1,8 @@
-import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { obtenerPersonal, eliminarPersonalUsuario, actualizarEstadoUsuario } from '../../api/ApiUsuarios/ApiUsuarios'
 import { FormularioUsuarioModal } from './FormularioUsuarioModal';
 import { Modal } from '../../components/Modal';
+import { useAutenticacion } from '../../context/AutenticacionContext';
 
 export function ListaUsuarios() {
   const [personal, setPersonal] = useState([])
@@ -11,6 +11,8 @@ export function ListaUsuarios() {
 
   const [modalAbierto, setModalAbierto] = useState(false);
   const [idEditar, setIdEditar] = useState(null);
+
+  const { tienePermiso } = useAutenticacion();
 
   useEffect(() => {
     cargarPersonal()
@@ -84,7 +86,10 @@ export function ListaUsuarios() {
 
       {/* Botón crear */}
       {/* <button><Link to="/usuarios/crear">Crear usuario</Link></button> */}
-      <button onClick={abrirModalCrear}>Crear usuario</button>
+
+      {tienePermiso('usuarios', 'Crear') && (
+        <button onClick={abrirModalCrear}>Crear usuario</button>
+      )}
 
       <table border="1" cellPadding="8" cellSpacing="0" style={{ marginTop: "15px", width: "100%" }}>
         <thead>
@@ -96,9 +101,11 @@ export function ListaUsuarios() {
             <th>Correo electronico</th>
             <th>Fecha creacion</th>
             <th>Usuario</th>
-            {/* <th>Rol</th> */}
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th>Rol</th>
+            {/* <th>Estado</th> */}
+            {tienePermiso('usuarios', 'Estados') && (<th>Estados</th>)}
+            {(tienePermiso('usuarios', 'Editar') || tienePermiso('usuarios', 'Eliminar')) && <th>Acciones</th>}
+            {/* <th>Acciones</th> */}
           </tr>
         </thead>
 
@@ -112,12 +119,14 @@ export function ListaUsuarios() {
               <td>{per.correo_elect_per}</td>
               <td>{new Date(per.fecha_crea_per).toLocaleDateString('es-ES')}</td>
               <td>{per.nombre_usuario}</td>
+              <td>{per.nombre_rol}</td>
               {/* <td> */}
                 {/* <button><Link to={`/usuarios/${per.id_personal}/detalles`}>Detalles</Link></button>{" | "} */}
                 {/* <button><Link to={`/usuarios/${per.id_personal}/editar`}>Editar</Link> </button>{" | "} */}
                 {/* <button onClick={() => manejarEliminacion(per.id_personal)}>Eliminar</button> */}
               {/* </td> */}
-              <td>
+              {tienePermiso('usuarios', 'Estados') && (
+                <td>
                 <label>
                   <input 
                     type="radio" 
@@ -137,16 +146,24 @@ export function ListaUsuarios() {
                   Inactivo
                 </label>
               </td>
-              <td>
-                <button onClick={()=>abrirModalEditar(per.id_personal)}>Editar</button>{" | "}
-                <button onClick={()=>manejarEliminacion(per.id_personal)}>Eliminar</button>
-              </td>
+              )}
+              {(tienePermiso('usuarios', 'Editar') || tienePermiso('usuarios', 'Eliminar')) && (
+                <td>
+                  {tienePermiso('usuarios', 'Editar') && (
+                    <button onClick={()=>abrirModalEditar(per.id_personal)}>Editar</button>
+                  )}
+                  {tienePermiso('usuarios', 'Eliminar') && (
+                  <button onClick={()=>manejarEliminacion(per.id_personal)}>Eliminar</button>
+                  )}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
       </table>
       {/* Modal */}
-          <Modal
+          {(tienePermiso('usuarios', 'Crear') || tienePermiso('usuarios', 'Editar')) && (
+            <Modal
             isOpen={modalAbierto}
             onCancelar={cerrarModal}
             titulo={idEditar ? "Editar Usuario" : "Crear Usuario"}
@@ -157,6 +174,7 @@ export function ListaUsuarios() {
               onCancelar={cerrarModal}
             />
           </Modal>
+          )}
 
     </>
   );

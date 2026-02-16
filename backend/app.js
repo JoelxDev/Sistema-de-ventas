@@ -1,22 +1,34 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import { probarConexion } from './src/config/conexion_bd.js';
+// ============================================================
+// IMPORTACIONES DE LAS RUTAS
+import loginRoutes from './src/modules/login/autenticacion.routes.js';
 import usuariosRoutes from './src/modules/usuarios/usuarios.routes.js';
-
+import permisosRoutes from './src/modules/permisos/permisos.routes.js';
+import modulosRoutes from './src/modules/modulos/modulos.routes.js';
+import rolesRoutes from './src/modules/roles/roles.routes.js';
+// ============================================================
 dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+app.use(cookieParser());
 app.use(express.json());
 
 // =============================================================
 // RUTAS ENDPOINTS
-// =============================================================
+app.use('/api/login', loginRoutes);
 app.use('/api/usuarios', usuariosRoutes);
-// =============================================================
-// FIN RUTAS ENDPOINTS  
+app.use('/api/permisos', permisosRoutes);
+app.use('/api/modulos', modulosRoutes);
+app.use('/api/roles', rolesRoutes);
 // =============================================================
 
 app.get('/', (req, res) => {

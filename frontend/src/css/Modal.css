@@ -42,6 +42,15 @@
   color: #666;
 }
 
+.modal-body input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 .modal-close:hover {
   color: #000;
 }

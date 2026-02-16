@@ -1,23 +1,44 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from './layouts/MainLayout';
 import { PerfilUsuario } from './pages/PerfilUsuario/PerfilUsuario.jsx';
-// import { ListaUsuarios } from './pages/Usuarios/ListaUsuarios.jsx';
 import { Dashboard } from './pages/Dashboard/Dashboard.jsx';
-import { Roles } from './pages/Roles/Roles.jsx';
+import { RutasRoles } from './pages/Roles/RutasRoles.jsx';
+import { RutasUsuario } from './pages/Usuarios/RutasUsuario.jsx';
+import { useAutenticacion } from './context/AutenticacionContext.jsx';
+import { Login } from './pages/Login/Login.jsx';
 
-import {  RutasUsuario } from './pages/Usuarios/RutasUsuario.jsx';
+function RutaProtegida({ children }){
+  const { estaAutenticado, cargando } = useAutenticacion()
+
+  if (cargando) return <p>Cargando...</p>
+  if (!estaAutenticado){
+    return <Navigate to="login"/>
+  }
+  return children
+}
 
 function App() {
   return (
     <Routes>
-      <Route element={<MainLayout />}>
-        {/* <Route index element={<Dashboard />} /> */}
-        <Route path="dashboard" element={<Dashboard />} />
+      {/* Ruta publica - Login */}
+      <Route path='/login' element={<Login/>}/>
+
+      {/* Rutas protegidas */}
+      <Route element={
+        <RutaProtegida>
+          <MainLayout/>
+        </RutaProtegida>
+      }>
         <Route path="perfil" element={<PerfilUsuario />} />
-        {/* <Route path="usuarios" element={<ListaUsuarios />} /> */}
+        <Route path="dashboard" element={<Dashboard />} />
         { RutasUsuario }
-        <Route path="roles" element={<Roles />} />
+        {/* <Route path="roles" element={<Roles />} /> */}
+        { RutasRoles }
       </Route>
+      {/* Redirigir raiz a login */}
+      <Route path="/" element={<Navigate to="/login"/>}/>
+      {/* Cualquier otra ruta redirige al login */}
+      <Route path="*" element={<Navigate to="/login"/>}/>
     </Routes>
   );
 }

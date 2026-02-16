@@ -1,0 +1,101 @@
+import pool from "../../config/conexion_bd.js";
+
+export async function crearRol(datos) {
+    const { nombre_rol, descripcion_rol, permisos } = datos;
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+        // Crear rol
+        const result = await connection.query(
+            'INSERT INTO roles (nombre_rol, descripcion_rol, fecha_crea_rol, estado_rol) VALUES (?, ?, NOW(), ?)',
+            [nombre_rol, descripcion_rol, 'activo']
+        );
+        const idRol = result[0].insertId;
+        // Insertar permisos en roles_y_permisos
+        if (permisos && permisos.length > 0) {
+            const valores = permisos.map(id_permiso => [idRol, id_permiso]);
+            await connection.query(
+                'INSERT INTO roles_y_permisos (roles_id_rol, permisos_id_permiso) VALUES ?',
+                [valores]
+            );
+        }
+
+        await connection.commit();
+        return idRol;
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+}
+
+export async function obtenerTodosLosRoles() {
+    const [rows] = await pool.query('SELECT * FROM roles');
+    return rows;
+}
+
+export async function obtenerRolPorId(id) {
+    const [rows] = await pool.query(
+        'SELECT * FROM roles WHERE id_rol = ?', [id]
+    );
+    if(rows.length === 0) return null;
+    const rol = rows[0];
+    // Obtener permisos asociados al rol
+    const [permisosRows] = await pool.query(
+        'SELECT permisos_id_permiso FROM roles_y_permisos WHERE roles_id_rol = ?', 
+        [id]);
+    // Agregar array de IDs de permisos al rol
+    rol.permisos = permisosRows.map(row => row.permisos_id_permiso);
+    return rol;
+}
+
+export async function actualizarRol(id, datos) {
+    const { nombre_rol, descripcion_rol, permisos} = datos;
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+        // Actualizar datos del rol
+        await connection.query(
+            'UPDATE roles SET nombre_rol = ?, descripcion_rol = ? WHERE id_rol = ?',
+            [nombre_rol, descripcion_rol, id]
+        );
+
+        await connection.query(
+            'DELETE FROM roles_y_permisos WHERE roles_id_rol = ?',
+            [id]
+        );
+
+        if(permisos && permisos.length > 0){
+            const valores = permisos.map(id_permiso => [id, id_permiso]);
+            await connection.query(
+                'INSERT INTO roles_y_permisos (roles_id_rol, permisos_id_permiso) VALUES ?',
+                [valores]
+            );
+        }
+        await connection.commit();
+        return true;
+    }catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+}
+
+export async function eliminarRol(id) {
+    const [result] = await pool.query(
+        'DELETE FROM roles WHERE id_rol = ?', [id]
+    );
+    return result.affectedRows;
+}
+
+export async function actualizarEstadoRol(id, estado) {
+    const result = await pool.query(
+        'UPDATE roles SET estado_rol = ? WHERE id_rol = ?',
+        [estado, id]
+    );
+    return result.affectedRows;
+}
+
+// 

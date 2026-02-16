@@ -1,55 +1,50 @@
-const API_URL = 'http://localhost:3200/api/usuarios';
+const API_URL = 'http://localhost:3200/api/permisos';
 
-export async function obtenerPersonal() {
+export async function obtenerPermisos() {
     const response = await fetch(API_URL, {credentials: 'include'});
-    if (!response.ok) throw new Error('Error al obtener personal')
+    if (!response.ok) throw new Error('Error al obtener roles')
     return response.json();
 }
-
-export async function obtenerPersonalPorId(id){
+export async function obtenerPermisoPorId(id){
     const response = await fetch(`${API_URL}/${id}`, {credentials: 'include'});
-    if(!response.ok) throw new Error('Error al obtener por ID') 
+    if(!response.ok) throw new Error('Error al obtener rol por ID') 
     return response.json();
 }
-
-export async function crearPersonal(datos) {
+export async function crearPermiso(datos) {
     const response = await fetch(API_URL, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include',
         body: JSON.stringify(datos),
     });
-    if (!response.ok) throw new Error('Error al crear personal')
+    if (!response.ok) throw new Error('Error al crear rol')
     return response.json();
 }
-
-export async function actualizarPersonal(id, datos) {
+export async function actualizarPermiso(id, datos) {
     const response = await fetch(`${API_URL}/${id}`, {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include',
         body: JSON.stringify(datos),
     });
-    if (!response.ok) throw new Error('Error al actualizar personal')
+    if (!response.ok) throw new Error('Error al actualizar rol')
     return response.json();
 }
-
-export async function eliminarPersonalUsuario(id) {
+export async function eliminarPermiso(id) {
     const response = await fetch(`${API_URL}/${id}`, {
         method: 'DELETE',
         credentials: 'include',
     });
-    if (!response.ok) throw new Error('Error al eliminar personal')
+    if (!response.ok) throw new Error('Error al eliminar rol')
     return response.json();
 }
-
-export async function actualizarEstadoUsuario(id, estado) {
+export async function actualizarEstadoPermiso(id, estado) {
     const response = await fetch(`${API_URL}/${id}/estado`, {
         method: 'PATCH',
         headers: {'Content-Type': 'application/json'},
-        credentials: 'include',
+        credentials:'include',
         body: JSON.stringify({ estado }),
     });
-    if (!response.ok) throw new Error('Error al actualizar estado del personal')
+    if (!response.ok) throw new Error('Error al actualizar estado del rol')
     return response.json();
 }

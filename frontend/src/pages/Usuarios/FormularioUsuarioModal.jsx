@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 // import { useParams, useNavigate } from 'react-router-dom';
 import { obtenerPersonalPorId, crearPersonal, actualizarPersonal } from '../../api/ApiUsuarios/ApiUsuarios';
-// import { use } from 'react';
+import { obtenerRoles } from '../../api/ApiRoles/ApiRoles';
 
 export function FormularioUsuarioModal({id, onGuardar, onCancelar}) {
     const [datosFormulario, setDatosFormulario] = useState({
@@ -10,15 +10,29 @@ export function FormularioUsuarioModal({id, onGuardar, onCancelar}) {
         dni_per: "",
         telefono_per: "",
         correo_elect_per: "",
+        roles_id_rol: "",
     });
+
+    const [roles, setRoles] = useState([]);
     const [cargando, setCargando] = useState(false);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
+    useEffect(() => { 
+        cargarRoles();
         if (id) {
             cargarPersonal();
         }
     }, [id]);
+
+    async function cargarRoles() {
+        try {
+            const rolesData = await obtenerRoles();
+            const rolesActivos = rolesData.filter(rol => rol.estado_rol === 'activo');
+            setRoles(rolesActivos);
+        } catch (err) {
+            setError(err.message);
+        }
+    }
 
     async function cargarPersonal() {
         try {
@@ -30,6 +44,7 @@ export function FormularioUsuarioModal({id, onGuardar, onCancelar}) {
                 dni_per: data.dni_per,
                 telefono_per: data.telefono_per,
                 correo_elect_per: data.correo_elect_per,
+                roles_id_rol: data.roles_id_rol,
             });
         } catch (err) {
             setError(err.message);
@@ -75,7 +90,6 @@ export function FormularioUsuarioModal({id, onGuardar, onCancelar}) {
           value={datosFormulario.nombre_per}
           onChange={manejarCambio}
           required
-          style={{ width: "100%", padding: "8px" }}
         />
       </div>
       
@@ -87,7 +101,6 @@ export function FormularioUsuarioModal({id, onGuardar, onCancelar}) {
           value={datosFormulario.apellido_per}
           onChange={manejarCambio}
           required
-          style={{ width: "100%", padding: "8px" }}
         />
       </div>
       
@@ -99,7 +112,6 @@ export function FormularioUsuarioModal({id, onGuardar, onCancelar}) {
           value={datosFormulario.dni_per}
           onChange={manejarCambio}
           required
-          style={{ width: "100%", padding: "8px" }}
         />
       </div>
       
@@ -111,7 +123,6 @@ export function FormularioUsuarioModal({id, onGuardar, onCancelar}) {
           value={datosFormulario.telefono_per}
           onChange={manejarCambio}
           required
-          style={{ width: "100%", padding: "8px" }}
         />
       </div>
       
@@ -123,8 +134,24 @@ export function FormularioUsuarioModal({id, onGuardar, onCancelar}) {
           value={datosFormulario.correo_elect_per}
           onChange={manejarCambio}
           required
-          style={{ width: "100%", padding: "8px" }}
         />
+      </div>
+
+      <div style={{ marginBottom: "15px" }}>
+        <label htmlFor="">Rol/Cargo</label> <br />
+        <select 
+            name="roles_id_rol"
+            value={datosFormulario.roles_id_rol} 
+            onChange={manejarCambio}
+            required
+            >
+                <option value="">---Seleccionar rol---</option>
+                {roles.map((rol) => (
+                  <option key={rol.id_rol} value={rol.id_rol}>
+                    {rol.nombre_rol}
+                  </option>
+                ))}
+        </select>
       </div>
 
       <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
