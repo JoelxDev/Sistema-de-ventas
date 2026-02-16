@@ -2,12 +2,14 @@ import { useState, useEffect } from "react"
 import { obtenerModulos, eliminarModulo, actualizarEstadoModulo } from "../../../api/ApiRoles/ApiModulos/ApiModulos.jsx"
 import { Modal } from "../../../components/Modal.jsx";
 import { FormularioModulos } from './FormularioModulos.jsx'
+import { useAutenticacion } from "../../../context/AutenticacionContext.jsx";
 
 
 export function ListaModulos() {
     const [modulos, setModulos] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
+    const { tienePermiso } = useAutenticacion();
 
     const [modalAbiertoModulo, setModalAbiertoModulo] = useState(false);
     const [idEditarModulo, setIdEditarModulo] = useState(null);
@@ -79,7 +81,9 @@ export function ListaModulos() {
 
   return (
     <div>
-        <button onClick={abrirModalCrearModulo}>Aniadir Modulo/Submodulo</button>
+        {tienePermiso('modulos', 'Crear') && (
+          <button onClick={abrirModalCrearModulo}>Aniadir Modulo/Submodulo</button>
+        )}
         <h1>Gestionar Modulos/Submodulos</h1>
         <table border="1" cellPadding="8" cellSpacing="0" style={{ marginTop: "15px", width: "100%" }}>
         <thead>
@@ -87,8 +91,8 @@ export function ListaModulos() {
             <th>Modulo</th>
             <th>Descripcion</th>
             <th>Fecha creacion</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            {tienePermiso('modulos', 'Estados') && <th>Estado</th>}
+            {(tienePermiso('modulos', 'Editar') || tienePermiso('modulos', 'Eliminar')) && <th>Acciones</th>}
           </tr>
         </thead>
         <tbody>
@@ -97,7 +101,8 @@ export function ListaModulos() {
               <td>{mod.nombre_modulo}</td>
               <td>{mod.descripcion_modulo}</td>
               <td>{new Date(mod.fecha_crea_modulo).toLocaleDateString('es-ES')}</td>
-              <td>
+              {tienePermiso('modulos', 'Estados') && (
+                <td>
                 <label>
                   <input 
                     type="radio" 
@@ -117,26 +122,35 @@ export function ListaModulos() {
                   Inactivo
                 </label>
               </td>
+              )}
+            {(tienePermiso('modulos', 'Editar') || tienePermiso('modulos', 'Eliminar')) && (
               <td>
-                <button onClick={()=>abrirModalEditarPermiso(mod.id_modulo)}>Editar</button>{" | "}
-                <button onClick={()=>manejarEliminacionModulo(mod.id_modulo)}>Eliminar</button>
+                {tienePermiso('modulos', 'Editar') && (
+                  <button onClick={()=>abrirModalEditarPermiso(mod.id_modulo)}>Editar</button>
+                )}
+                {tienePermiso('modulos', 'Eliminar') && (
+                  <button onClick={()=>manejarEliminacionModulo(mod.id_modulo)}>Eliminar</button>
+                )}
               </td>
+            )}
             </tr>
           ))}
         </tbody>
       </table>
           {/* Modal */}
-          <Modal
-          isOpen={ modalAbiertoModulo }
-          onCancelar = { cerrarModal }
-          titulo={idEditarModulo ? "Editar Modulos" : "Aniadir Modulo"}
-          >
+          {(tienePermiso('modulos', 'Crear') || tienePermiso('modulos', 'Editar')) && (
+            <Modal
+            isOpen={ modalAbiertoModulo }
+            onCancelar = { cerrarModal }
+            titulo={idEditarModulo ? "Editar Modulos" : "Aniadir Modulo"}
+            >
             <FormularioModulos
             id={ idEditarModulo }
             onGuardar={ manejarGuardadoModulo }
             onCancelar ={ cerrarModal }
             />
           </Modal>
+          )}
 
     </div>
   )
