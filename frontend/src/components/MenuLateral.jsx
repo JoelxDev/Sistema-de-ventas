@@ -15,6 +15,9 @@ export function MenuLateral() {
         {tieneAccesoModulo('roles') && (
           <li><Link to="/roles">Roles</Link></li>
         )}
+        {tieneAccesoModulo('sucursales') && (
+          <li><Link to="/sucursales">Sucursales</Link></li>
+        )}
       </ul>
       <button onClick={logout}>Cerrar Sesion</button>
     </nav>

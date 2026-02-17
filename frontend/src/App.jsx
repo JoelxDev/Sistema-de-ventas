@@ -4,6 +4,8 @@ import { PerfilUsuario } from './pages/PerfilUsuario/PerfilUsuario.jsx';
 import { Dashboard } from './pages/Dashboard/Dashboard.jsx';
 import { RutasRoles } from './pages/Roles/RutasRoles.jsx';
 import { RutasUsuario } from './pages/Usuarios/RutasUsuario.jsx';
+import { RutasSucursales } from './pages/Sucursales/RutasSucursal.jsx';
+
 import { useAutenticacion } from './context/AutenticacionContext.jsx';
 import { Login } from './pages/Login/Login.jsx';
 
@@ -34,6 +36,7 @@ function App() {
         { RutasUsuario }
         {/* <Route path="roles" element={<Roles />} /> */}
         { RutasRoles }
+        { RutasSucursales }
       </Route>
       {/* Redirigir raiz a login */}
       <Route path="/" element={<Navigate to="/login"/>}/>
