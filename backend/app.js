@@ -10,6 +10,7 @@ import usuariosRoutes from './src/modules/usuarios/usuarios.routes.js';
 import permisosRoutes from './src/modules/permisos/permisos.routes.js';
 import modulosRoutes from './src/modules/modulos/modulos.routes.js';
 import rolesRoutes from './src/modules/roles/roles.routes.js';
+import sucursalesRoutes from './src/modules/sucursales/sucursales.routes.js';
 // ============================================================
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/permisos', permisosRoutes);
 app.use('/api/modulos', modulosRoutes);
 app.use('/api/roles', rolesRoutes);
+app.use('/api/sucursales', sucursalesRoutes);
 // =============================================================
 
 app.get('/', (req, res) => {

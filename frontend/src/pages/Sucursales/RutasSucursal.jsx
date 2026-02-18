@@ -6,5 +6,6 @@ export const RutasSucursales = (
     <Route path="sucursales">
         <Route index element= {<PaginaSucursales/>}/>
         <Route path="crear" element = {<FormularioSucursal/>}/>
+        <Route path=":id/editar" element = {<FormularioSucursal/>}/>
     </Route>
 )

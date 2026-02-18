@@ -4,7 +4,7 @@ export function verificarPermisos(modulo, permiso) {
 
         if(!permisos || !permisos[modulo]){
             return res.status(403).json({
-                mensaje: "Acceso denegado: No tienes permisos para acceder a este módulo"
+                mensaje: `Acceso denegado: No tienes permisos para acceder a este módulo "${modulo}"`
             })
         }
 
