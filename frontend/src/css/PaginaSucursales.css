@@ -1,0 +1,174 @@
+.pagina-sucursales {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.sucursales-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.sucursales-header h1 {
+    font-size: 1.8rem;
+    color: #333;
+}
+
+.btn-crear {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.btn-crear:hover {
+    background-color: #1d4ed8;
+}
+
+/* ===== LISTA DE SUCURSALES ===== */
+.lista-sucursales {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ===== TARJETA RECTANGULAR (ancha y baja) ===== */
+.tarjeta-sucursal {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-left: 5px solid #2563eb;
+    border-radius: 8px;
+    padding: 16px 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.tarjeta-sucursal:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-1px);
+}
+
+/* Nombre de la sucursal */
+.tarjeta-nombre {
+    min-width: 180px;
+}
+
+.tarjeta-nombre h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+/* Cada dato (ubicación, ciudad, estado) */
+.tarjeta-dato {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 150px;
+}
+
+.etiqueta {
+    font-weight: 600;
+    color: #64748b;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.tarjeta-dato span:last-child {
+    color: #334155;
+    font-size: 0.95rem;
+}
+
+/* Select de estado */
+.select-estado {
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 2px solid #cbd5e1;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.select-estado.activo {
+    border-color: #22c55e;
+    color: #16a34a;
+    background-color: #f0fdf4;
+}
+
+.select-estado.inactivo {
+    border-color: #ef4444;
+    color: #dc2626;
+    background-color: #fef2f2;
+}
+
+/* Botones de acción */
+.tarjeta-acciones {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.btn-editar {
+    background-color: #f59e0b;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.btn-editar:hover {
+    background-color: #d97706;
+}
+
+.btn-eliminar {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.btn-eliminar:hover {
+    background-color: #dc2626;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .tarjeta-sucursal {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .tarjeta-nombre {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .tarjeta-acciones {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

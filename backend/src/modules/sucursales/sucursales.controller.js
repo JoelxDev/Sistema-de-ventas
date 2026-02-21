@@ -78,8 +78,8 @@ export async function eliminarSucursal(req, res){
 export async function actualizarEstadoSucursal(req, res) {
     try {
         const { id } = req.params;
-        const { estado_suc } = req.body;
-        await SucursalModel.actualizarEstadoSucursal(id, estado_suc);
+        const { estado } = req.body;
+        await SucursalModel.actualizarEstadoSucursal(id, estado);
         res.json({ mensaje: "Estado de sucursal actualizado correctamente" });
     } catch (error) {
         console.error("❌ Error al actualizar estado de sucursal:", error);
