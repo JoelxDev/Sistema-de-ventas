@@ -5,6 +5,7 @@ import { useAutenticacion } from '../../context/AutenticacionContext.jsx';
 export function Login() {
     const [nombreUsuario, setNombreUsuario] = useState('');
     const [contrasenia, setContrasenia] = useState('');
+    const [sucursal, setSucursal] = useState('');
     const [error, setError] = useState('');
     const [cargando, setCargando] = useState(false);
 
@@ -17,7 +18,7 @@ export function Login() {
         setCargando(true);
 
         try {
-            await login(nombreUsuario, contrasenia);
+            await login(nombreUsuario, contrasenia, sucursal);
             navegar('/dashboard');
         } catch (err) {
             setError(err.message);
@@ -63,6 +64,16 @@ export function Login() {
                         value={contrasenia}
                         onChange={(e) => setContrasenia(e.target.value)}
                         required
+                        style={{ width: '100%', padding: '8px' }}
+                    />
+                </div>
+                
+                <div style={{ marginBottom: '15px' }}>
+                    <label>Sucursal</label><br />
+                    <input
+                        type="sucursal"
+                        value={sucursal}
+                        onChange={(e) => setSucursal(e.target.value)}
                         style={{ width: '100%', padding: '8px' }}
                     />
                 </div>
