@@ -11,6 +11,7 @@ router.get('/:id', verificarPermisos('roles', 'Vista'),RolesController.obtenerRo
 router.put('/:id', verificarPermisos('roles', 'Editar'),RolesController.actualizarRol);
 router.delete('/:id', verificarPermisos('roles', 'Eliminar'),RolesController.eliminarRol);
 router.patch('/:id/estado', verificarPermisos('roles', 'Estados'),RolesController.actualizarEstadoRol);
+router.patch('/:id/sucursal', verificarPermisos('roles', 'Estados'),RolesController.actualizarRequiereSucursal);
 
 export default router;
 

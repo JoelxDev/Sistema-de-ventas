@@ -53,3 +53,16 @@ export async function actualizarEstadoRol(id, estado) {
     if (!response.ok) throw new Error('Error al actualizar estado del rol')
     return response.json();
 }
+
+export async function actualizarRequireSucursal(id, requiereSucursal) {
+
+    const response = await fetch(`${API_URL_ROLES}/${id}/sucursal`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        credentials:'include',
+        body: JSON.stringify({ requiereSucursal }),
+    });
+    console.log('Respuesta de la API:', requiereSucursal);
+    if (!response.ok) throw new Error('Error al actualizar requiere sucursal del rol')
+    return response.json();
+}

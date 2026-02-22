@@ -77,3 +77,17 @@ export async function actualizarEstadoRol(req, res) {
     }
 }
 
+export async function actualizarRequiereSucursal(req, res) {
+    try{
+        const { id } = req.params;
+        const { requiereSucursal } = req.body;
+        const filasAfectadas = await RolesModel.actualizarRequiereSucursal(id, requiereSucursal);
+        if (filasAfectadas === 0) {
+            return res.status(404).json({ mensaje: "Rol no encontrado" });
+        }
+        res.json({ mensaje: "Requiere sucursal actualizado" })
+    }catch(error){
+        console.log("Error al actualizar requiere sucursal")
+        res.status(500).json({ mensaje: "Error al actualizar require sucursal", error: error.message })
+    }
+}

@@ -22,8 +22,8 @@ export function AutenticacionProvider({ children }) {
         }
     }
 
-    async function login(nombre_usuario, contrasenia) {
-        const data = await apiLogin(nombre_usuario, contrasenia);
+    async function login(nombre_usuario, contrasenia, sucursalLogin) {
+        const data = await apiLogin(nombre_usuario, contrasenia, sucursalLogin);
         setUsuario(data.usuario);
         return data;
     }

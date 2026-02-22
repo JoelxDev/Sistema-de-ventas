@@ -3,7 +3,8 @@ import bcrypt from "bcrypt";
 
 
 
-export async function loginSesion(nombre_usuario, contrasenia) {
+export async function loginSesion(nombre_usuario, contrasenia, sucursalLogin) {
+
     const [usuarios] = await pool.query(
         `SELECT
             u.id_usuario,
@@ -12,7 +13,8 @@ export async function loginSesion(nombre_usuario, contrasenia) {
             u.estado_usuario,
             u.roles_id_rol,
             p.nombre_per,
-            r.nombre_rol
+            r.nombre_rol,
+            r.requiere_sucursal
         FROM usuarios u
         JOIN personal p ON p.id_personal = u.personal_id_personal
         JOIN roles r ON r.id_rol = u.roles_id_rol
@@ -33,6 +35,26 @@ export async function loginSesion(nombre_usuario, contrasenia) {
             throw new Error("Contraseña incorrecta");
         }
         
+        if(usuario.requiere_sucursal === 'si' && !sucursalLogin) {
+            throw new Error("Este usuario requiere ingresar una sucursal");
+        }
+
+        const [filaSucursal] = await pool.query(
+            'SELECT * FROM sucursales WHERE id_sucursal = ? ',
+        [sucursalLogin]
+        );
+
+        if(filaSucursal.length === 0){
+            throw new Error("Sucursal no encontrada");
+        }
+
+        const sucursal = filaSucursal[0];
+
+        if(sucursal.estado_suc !== 'activo') {
+            throw new Error("Esta sucursal esta inactiva");
+        }
+
+
         const [permisos] = await pool.query(
             `SELECT p.nombre_perm, m.nombre_modulo
              FROM roles_y_permisos rp

@@ -7,8 +7,8 @@ export async function crearRol(datos) {
         await connection.beginTransaction();
         // Crear rol
         const result = await connection.query(
-            'INSERT INTO roles (nombre_rol, descripcion_rol, fecha_crea_rol, estado_rol) VALUES (?, ?, NOW(), ?)',
-            [nombre_rol, descripcion_rol, 'activo']
+            'INSERT INTO roles (nombre_rol, descripcion_rol, fecha_crea_rol, estado_rol, requiere_sucursal) VALUES (?, ?, NOW(), ?, ?)',
+            [nombre_rol, descripcion_rol, 'activo', 'no']
         );
         const idRol = result[0].insertId;
         // Insertar permisos en roles_y_permisos
@@ -98,4 +98,10 @@ export async function actualizarEstadoRol(id, estado) {
     return result.affectedRows;
 }
 
-// 
+export async function actualizarRequiereSucursal(id, requireSucursal) {
+    const result =  await pool.query(
+        'UPDATE roles SET requiere_sucursal = ? WHERE id_rol = ?',
+        [requireSucursal, id]
+    );
+    return result.affectedRows;
+}

@@ -1,8 +1,8 @@
-import { Link, Routes } from "react-router-dom"; 
+import { Link, Routes } from "react-router-dom";
 import { Modal } from "../../components/Modal";
 import { useState, useEffect } from "react";
 import { FormularioRoles } from "./FormularioRoles";
-import { obtenerRoles, eliminarRol, actualizarEstadoRol } from "../../api/ApiRoles/ApiRoles";
+import { obtenerRoles, eliminarRol, actualizarEstadoRol, actualizarRequireSucursal } from "../../api/ApiRoles/ApiRoles";
 import { useAutenticacion } from "../../context/AutenticacionContext";
 
 
@@ -66,9 +66,9 @@ export function Roles() {
     try {
       await actualizarEstadoRol(id, nuevoEstado);
       cargarRoles();
-      setRoles(roles.map(rol =>{
-        if(rol.id_rol === id){
-          return {...rol, estado_rol: nuevoEstado};
+      setRoles(roles.map(rol => {
+        if (rol.id_rol === id) {
+          return { ...rol, estado_rol: nuevoEstado };
         }
         return rol;
       }));
@@ -77,9 +77,18 @@ export function Roles() {
     }
   }
 
-    if (cargando) return <div>Cargando...</div>;
-    if (error) return <div>Error...</div>;
-  
+  async function manejarRequiereSucursal(id, requireSucursal) {
+    try {
+      await actualizarRequireSucursal(id, requireSucursal);
+      cargarRoles();
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  if (cargando) return <div>Cargando...</div>;
+  if (error) return <div>Error...</div>;
+
 
 
   return (
@@ -104,6 +113,7 @@ export function Roles() {
             <th>Descripcion</th>
             <th>Fecha creacion</th>
             {tienePermiso('roles', 'Estados') && <th>Estado</th>}
+            <th>Requiere Sucursal</th>
             {(tienePermiso('roles', 'Editar') || tienePermiso('roles', 'Eliminar')) && <th>Acciones</th>}
           </tr>
         </thead>
@@ -115,35 +125,55 @@ export function Roles() {
               <td>{new Date(rol.fecha_crea_rol).toLocaleDateString('es-ES')}</td>
               {tienePermiso('roles', 'Estados') && (
                 <td>
+                  <label>
+                    <input
+                      type="radio"
+                      name={`estado-${rol.id_rol}`}
+                      checked={rol.estado_rol === 'activo'}
+                      onChange={() => manejarCambioEstadoRol(rol.id_rol, 'activo')}
+                    />
+                    Activo
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name={`estado-${rol.id_rol}`}
+                      checked={rol.estado_rol === 'inactivo'}
+                      onChange={() => manejarCambioEstadoRol(rol.id_rol, 'inactivo')}
+                    />
+                    Inactivo
+                  </label>
+                </td>
+              )}
+              <td>
                 <label>
-                  <input 
-                    type="radio" 
-                    name={`estado-${rol.id_rol}`}
-                    checked={rol.estado_rol === 'activo'}
-                    onChange={() => manejarCambioEstadoRol(rol.id_rol, 'activo')}
+                  <input
+                    type="radio"
+                    name={`requiereSucursal-${rol.id_rol}`}
+                    checked={rol.requiere_sucursal === 'si'}
+                    onChange={() => manejarRequiereSucursal(rol.id_rol, 'si')}
                   />
-                  Activo
+                  Si
                 </label>
                 <label>
-                  <input 
-                    type="radio" 
-                    name={`estado-${rol.id_rol}`}
-                    checked={rol.estado_rol === 'inactivo'}
-                    onChange={() => manejarCambioEstadoRol(rol.id_rol, 'inactivo')}
+                  <input
+                    type="radio"
+                    name={`requiereSucursal-${rol.id_rol}`}
+                    checked={rol.requiere_sucursal === 'no'}
+                    onChange={() => manejarRequiereSucursal(rol.id_rol, 'no')}
                   />
-                  Inactivo
+                  No
                 </label>
               </td>
-              )}
-              {(tienePermiso('roles', 'Editar')|| tienePermiso('roles', 'Eliminar')) && (
+              {(tienePermiso('roles', 'Editar') || tienePermiso('roles', 'Eliminar')) && (
                 <td>
                   {tienePermiso('roles', 'Editar') && (
-                    <button onClick={()=>abrirModalEditarRol(rol.id_rol)}>Editar</button>
+                    <button onClick={() => abrirModalEditarRol(rol.id_rol)}>Editar</button>
                   )}
                   {tienePermiso('roles', 'Eliminar') && (
-                    <button onClick={()=>manejarEliminacionRol(rol.id_rol)}>Eliminar</button>
+                    <button onClick={() => manejarEliminacionRol(rol.id_rol)}>Eliminar</button>
                   )}
-              </td>
+                </td>
               )}
             </tr>
           ))}
@@ -154,16 +184,16 @@ export function Roles() {
 
       {(tienePermiso('roles', 'Crear') || tienePermiso('roles', 'Editar')) && (
         <Modal
-        isOpen={modalAbierto}
-        onCancelar={cerrarModal}
-        titulo={idEditar ? "Editar Rol" : "Crear Rol"}
-        >
-        <FormularioRoles
-          id={idEditar}
-          onGuardar={manejarGuardado}
+          isOpen={modalAbierto}
           onCancelar={cerrarModal}
-        />
-      </Modal>
+          titulo={idEditar ? "Editar Rol" : "Crear Rol"}
+        >
+          <FormularioRoles
+            id={idEditar}
+            onGuardar={manejarGuardado}
+            onCancelar={cerrarModal}
+          />
+        </Modal>
       )}
     </div>
   );

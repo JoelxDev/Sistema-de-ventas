@@ -4,11 +4,12 @@ import jwt from 'jsonwebtoken';
 export async function login(req, res) {
 
     try{
-        const { nombre_usuario, contrasenia } = req.body;
+        const { nombre_usuario, contrasenia, sucursalLogin } = req.body;
         if (!nombre_usuario || !contrasenia) {
             return res.status(400).json({ mensaje: "Usuario y contrasenia son requeridos" });
         }
-        const usuario =  await LoginModel.loginSesion(nombre_usuario, contrasenia);
+        
+        const usuario =  await LoginModel.loginSesion(nombre_usuario, contrasenia, sucursalLogin);
 
         // Crear el token JWT
         const token = jwt.sign(

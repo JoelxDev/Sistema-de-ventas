@@ -5,7 +5,7 @@ import { useAutenticacion } from '../../context/AutenticacionContext.jsx';
 export function Login() {
     const [nombreUsuario, setNombreUsuario] = useState('');
     const [contrasenia, setContrasenia] = useState('');
-    const [sucursal, setSucursal] = useState('');
+    const [sucursalLogin, setSucursalLogin] = useState('');
     const [error, setError] = useState('');
     const [cargando, setCargando] = useState(false);
 
@@ -18,7 +18,7 @@ export function Login() {
         setCargando(true);
 
         try {
-            await login(nombreUsuario, contrasenia, sucursal);
+            await login(nombreUsuario, contrasenia, sucursalLogin);
             navegar('/dashboard');
         } catch (err) {
             setError(err.message);
@@ -71,9 +71,12 @@ export function Login() {
                 <div style={{ marginBottom: '15px' }}>
                     <label>Sucursal</label><br />
                     <input
-                        type="sucursal"
-                        value={sucursal}
-                        onChange={(e) => setSucursal(e.target.value)}
+                        type="number"
+                        value={sucursalLogin}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setSucursalLogin(value === '' ? '' : Number(value))
+                        }}
                         style={{ width: '100%', padding: '8px' }}
                     />
                 </div>

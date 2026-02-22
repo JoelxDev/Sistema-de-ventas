@@ -1,11 +1,11 @@
 const API_URL_LOGIN = import.meta.env.VITE_API_URL_LOGIN || 'http://localhost:3200/api/login';
  
-export async function apiLogin(nombre_usuario, contrasenia, sucursal) {
+export async function apiLogin(nombre_usuario, contrasenia, sucursalLogin) {
     const response = await fetch(`${API_URL_LOGIN}/`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include',
-        body: JSON.stringify({ nombre_usuario, contrasenia, sucursal })
+        body: JSON.stringify({ nombre_usuario, contrasenia, sucursalLogin })
     });
 
     const data =  await response.json();
