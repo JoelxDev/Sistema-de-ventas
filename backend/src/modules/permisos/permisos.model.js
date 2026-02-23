@@ -14,7 +14,7 @@ export async function crearPermiso(datos) {
 
     const [result] = await pool.query(
         'INSERT INTO permisos (nombre_perm, descripcion_perm, fecha_crea_perm, estado_perm, modulos_id_modulo) VALUES (?, ?, NOW(), ?, ?)',
-        [nombre_perm, descripcion_perm, 'activo', modulos_id_modulo]
+        [nombre_perm, descripcion_perm, 'inactivo', modulos_id_modulo]
     );
     return result.insertId;
 } 
