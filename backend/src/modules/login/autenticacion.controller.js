@@ -1,4 +1,5 @@
 import * as LoginModel from './autenticacion.model.js';
+import { registrarUsuarioSucursal, registrarFinSesion } from '../sesiones/sesiones.model.js';
 import jwt from 'jsonwebtoken';
 
 export async function login(req, res) {
@@ -8,8 +9,13 @@ export async function login(req, res) {
         if (!nombre_usuario || !contrasenia) {
             return res.status(400).json({ mensaje: "Usuario y contrasenia son requeridos" });
         }
-        
+        // Usamos el modelo autenticacion
         const usuario =  await LoginModel.loginSesion(nombre_usuario, contrasenia, sucursalLogin);
+
+        // Registramos la sesion usando el modelo sesiones
+
+
+        const { idUsuarioSucursal, idSesion } = await registrarUsuarioSucursal(usuario.id_usuario, sucursalLogin);
 
         // Crear el token JWT
         const token = jwt.sign(
@@ -17,7 +23,9 @@ export async function login(req, res) {
                 id: usuario.id_usuario,
                 usuario: usuario.nombre_usuario,
                 rol: usuario.nombre_rol,
-                permisos: usuario.permisos
+                permisos: usuario.permisos,
+                idSesion,
+                // idUsuarioSucursal,
             },
             process.env.JWT_SECRET,
             { expiresIn: '8h' }
@@ -43,8 +51,17 @@ export async function login(req, res) {
 }
 
 export async function logout(req, res) {
-    res.clearCookie('token');
-    res.json({mensaje: 'Sesion cerrada'})
+    try{
+        const { idSesion } = req.usuario;
+
+        await registrarFinSesion(idSesion);
+
+        res.clearCookie('token');
+        res.json({mensaje: 'Sesion cerrada'})
+    }catch(error){
+        console.error("❌ Error en el logout:", error.message);
+        res.status(500).json({ mensaje: error.message });
+    }
 }
 
 export async function verificarSesion(req, res) {

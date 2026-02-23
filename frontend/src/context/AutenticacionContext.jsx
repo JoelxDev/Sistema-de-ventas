@@ -50,6 +50,7 @@ export function AutenticacionProvider({ children }) {
             usuario,
             cargando,
             login,
+            logout,
             tienePermiso,
             tieneAccesoModulo,
             estaAutenticado: !!usuario

@@ -21,7 +21,15 @@ export async function apiLogout() {
         method: 'POST',
         credentials: 'include'
     });
-    return response.json();
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.mensaje || 'Error al cerrar sesión');
+    }
+
+    window.location.href = '/login';
+    return data;
 }
 
 export async function verificarSesion() {

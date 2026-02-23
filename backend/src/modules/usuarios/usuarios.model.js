@@ -37,7 +37,7 @@ export async function crearPersonal(datos) {
     try {
         await connection.beginTransaction();
 
-        const [resultPersonal] = await pool.query(
+        const [resultPersonal] = await connection.query(
             'INSERT INTO personal (nombre_per, apellido_per, dni_per, telefono_per, correo_elect_per, fecha_crea_per) VALUES (?, ?, ?, ?, ?, NOW())',
             [nombre_per, apellido_per, dni_per, telefono_per, correo_elect_per]
         );

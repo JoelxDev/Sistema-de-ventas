@@ -44,13 +44,13 @@ export async function loginSesion(nombre_usuario, contrasenia, sucursalLogin) {
         [sucursalLogin]
         );
 
-        if(filaSucursal.length === 0){
+        if(usuario.requiere_sucursal === 'si' && filaSucursal.length === 0){
             throw new Error("Sucursal no encontrada");
         }
 
         const sucursal = filaSucursal[0];
 
-        if(sucursal.estado_suc !== 'activo') {
+        if(usuario.requiere_sucursal === 'si' && sucursal.estado_suc !== 'activo') {
             throw new Error("Esta sucursal esta inactiva");
         }
 
