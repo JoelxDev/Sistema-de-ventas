@@ -6,6 +6,7 @@ import { RutasRoles } from './pages/Roles/RutasRoles.jsx';
 import { RutasUsuario } from './pages/Usuarios/RutasUsuario.jsx';
 import { RutasSucursales } from './pages/Sucursales/RutasSucursal.jsx';
 import { RutasSesiones } from './pages/Sesiones/RutasSesiones.jsx';
+import { RutasCategorias } from './pages/Categorias/RutasCategoria.jsx';
 
 import { useAutenticacion } from './context/AutenticacionContext.jsx';
 import { Login } from './pages/Login/Login.jsx';
@@ -35,10 +36,10 @@ function App() {
         <Route path="perfil" element={<PerfilUsuario />} />
         <Route path="dashboard" element={<Dashboard />} />
         { RutasUsuario }
-        {/* <Route path="roles" element={<Roles />} /> */}
         { RutasRoles }
         { RutasSucursales }
         { RutasSesiones }
+        { RutasCategorias }
       </Route>
       {/* Redirigir raiz a login */}
       <Route path="/" element={<Navigate to="/login"/>}/>

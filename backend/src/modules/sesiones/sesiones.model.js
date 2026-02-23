@@ -59,6 +59,7 @@ export async function obtenerDatosSesion() {
             r.nombre_rol,
             s.nombre_suc,
             s.ubicacion_suc,
+            ses.id_sesion,
             ses.fecha_entrada_ses,
             ses.fecha_finalizo_ses
         FROM sesiones ses

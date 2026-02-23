@@ -21,6 +21,9 @@ export function MenuLateral() {
         {tieneAccesoModulo('sesiones') && (
           <li><Link to="/sesiones">Sesiones</Link></li>
         )}
+        {tieneAccesoModulo('categorias') && (
+          <li><Link to="/categorias">Categorias</Link></li>
+        )}
       </ul>
       <button onClick={logout}>Cerrar Sesion</button>
     </nav>

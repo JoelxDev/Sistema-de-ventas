@@ -47,7 +47,7 @@ export function PaginaSesiones() {
                 </thead>
                 <tbody>
                     {datosSesiones.map((ds) => (
-                        <tr >
+                        <tr key={ds.id_sesion}>
                             <td>{ds.nombre_per}</td>
                             <td>{ds.apellido_per}</td>
                             <td>{ds.nombre_usuario}</td>
