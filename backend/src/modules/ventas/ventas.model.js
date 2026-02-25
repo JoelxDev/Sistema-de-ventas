@@ -1,9 +1,10 @@
 import pool from '../../config/conexion_bd.js';
 import { obtenerProductoPorId } from '../productos/productos.model.js';
-    
-export async function crearVenta(datos) {
+
+
+export async function crearVenta(datos, idUsuarioSucursal) {
     const conecction = await pool.getConnection();
-    const { tipo_venta, metodo_pago_venta, total_pagar, monto_recivido, idUsuarioSucursal, detalles_ventas } = datos
+    const { tipo_venta, metodo_pago_venta, total_pagar, monto_recivido, detalles_ventas } = datos
 
     if (total_pagar > monto_recivido) {
         throw new Error("El monto recibido no puede ser menor al total a pagar");
