@@ -51,3 +51,10 @@ export async function actualizarEstadoProducto(idProducto, estado_prod) {
     );
     return result.affectedRows;
 }
+
+export async function obtenerProductosActivos() {
+    const [rows] = await pool.query(
+        'SELECT * FROM productos WHERE estado_prod = "activo"'
+    );
+    return rows;
+}

@@ -25,7 +25,7 @@ export async function login(req, res) {
                 rol: usuario.nombre_rol,
                 permisos: usuario.permisos,
                 idSesion,
-                // idUsuarioSucursal,
+                idUsuarioSucursal,
             },
             process.env.JWT_SECRET,
             { expiresIn: '8h' }
