@@ -41,7 +41,7 @@ export async function actualizarProducto(req, res) {
         if (filasAfectadas === 0) {
             return res.status(404).json({ mensaje: "Producto no encontrado", producto: idProducto || "Hola" });
         }
-        res.json({ mensaje: "Producto actualizado correctamente", datosActualizados: req.body });
+        res.json({ mensaje: "Producto actualizado correctamente"});
     }catch (error){
         console.error("❌ Error al actualizar el producto:", error);
         res.status(500).json({ mensaje: "Error al actualizar el producto", error: error.message })
@@ -55,7 +55,7 @@ export async function eliminarProducto(req, res) {
         if (!producto) {
             return res.status(404).json({ mensaje: "Producto no encontrado" })
         }
-        if (producto.estado_prod !== 'activo') {
+        if (producto.estado_prod !== 'inactivo') {
             return res.status(400).json({
                 mensaje: "No se puede eliminar un producto con estado ACTIVO"
             })

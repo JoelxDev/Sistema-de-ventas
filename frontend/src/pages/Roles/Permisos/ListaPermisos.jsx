@@ -33,13 +33,11 @@ export function ListaPermisos() {
   async function manejarCambioEstadoPermiso(id, nuevoEstadoPermiso) {
     try{
       await actualizarEstadoPermiso(id, nuevoEstadoPermiso);
-      cargarPermisos();
-      setPermisos(permisos.map(perm => {
-        if(perm.id_permiso === id){
-          return { ...perm, estado_perm: nuevoEstadoPermiso };
-        }
-        return perm;
-      }));
+      setPermisos(permisos.map(perm =>
+            perm.id_permiso === id
+                ? { ...perm, estado_perm: nuevoEstadoPermiso }
+                : perm
+        ));
     }catch(err){
       setError(err.message);
     }

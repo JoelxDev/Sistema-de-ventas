@@ -11,7 +11,13 @@ export async function crearProducto(datos) {
 }
 
 export async function obtenerProductos() {
-    const [rows] = await pool.query('SELECT * FROM productos');
+    const [rows] = await pool.query(`
+        SELECT 
+            p.*,
+            c.nombre_categoria
+        FROM productos p
+        JOIN categorias c ON p.categorias_id_categoria = c.id_categoria
+    `);
     return rows;
 }
 

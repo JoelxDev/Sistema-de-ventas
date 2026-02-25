@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { obtenerCategorias, eliminarCategoria, obtenerCategoriaPorId } from "../../api/ApiCategorias/ApiCategorias";
+import { obtenerCategorias, eliminarCategoria } from "../../api/ApiCategorias/ApiCategorias";
 import { FormularioCategoria } from "./FormularioCategoria";
 import { Modal } from "../../components/Modal";
 import { useAutenticacion } from "../../context/AutenticacionContext";
@@ -65,9 +65,9 @@ export function PaginaCategorias() {
 
     return (
         <div>
-            <button onClick={abrirModalCrear}>Aniadir Modulo/Submodulo</button>
 
             <h1>Categorias</h1>
+            <button onClick={abrirModalCrear}>Aniadir Categoria</button>
             <table border="1" cellPadding="8" cellSpacing="0" style={{ marginTop: "15px", width: "100%" }}>
                 <thead>
                     <tr>
