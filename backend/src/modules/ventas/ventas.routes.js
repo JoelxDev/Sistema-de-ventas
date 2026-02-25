@@ -4,9 +4,8 @@ import { verificarToken } from '../../middlewares/verificarToken.js';
 import { verificarPermisos } from '../../middlewares/verificarPermisos.js';
 
 const router = Router();
-router.use(verificarToken)
 router.post('/',verificarPermisos('ventas', 'Crear'), VentasController.crearVenta);
-router.get('/', verificarPermisos('ventas', 'Vista'), VentasController.obtenerVentas);
+router.get('/', VentasController.obtenerVentas);
 router.get('/:idSucursal', verificarPermisos('ventas', 'Vista'), VentasController.obtenerVentasPorSucursal);
 
 export default router;

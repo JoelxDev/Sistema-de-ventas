@@ -64,7 +64,6 @@ export async function crearVenta(datos, idUsuarioSucursal) {
 export async function obtenerVentas() {
     const [rows] = await pool.query(`
         SELECT 
-            -- Datos de la venta
             v.id_venta,
             v.tipo_venta,
             v.metodo_pago_venta,
@@ -72,42 +71,32 @@ export async function obtenerVentas() {
             v.total_pagar,
             v.monto_recivido,
             v.vuelto,
-
-            -- Quien registró la venta
             u.id_usuario,
             CONCAT(p.nombre_per, ' ', p.apellido_per) AS nombre_completo,
             s.nombre_suc AS sucursal,
-
-            -- Detalles de la venta
             dv.id_detalles_venta,
             dv.cantidad_dv,
             dv.sub_total_dv,
             dv.fecha_dv,
-
-            -- Producto
             pr.id_producto,
             pr.nombre_prod,
             pr.precio_unitario_prod
-
         FROM ventas v
-        -- Quien registró
         INNER JOIN usuarios_sucursal us ON v.usuarios_sucursal_id_usuarios_sucursal = us.id_usuarios_sucursal
         INNER JOIN usuarios u ON us.usuarios_id_usuario = u.id_usuario
         INNER JOIN personal p ON u.personal_id_personal = p.id_personal
         INNER JOIN sucursales s ON us.sucursales_id_sucursal = s.id_sucursal
-        -- Detalles y productos
         INNER JOIN detalles_ventas dv ON v.id_venta = dv.ventas_id_venta
         INNER JOIN productos pr ON dv.productos_id_producto = pr.id_producto
-
         ORDER BY v.fecha_venta DESC
     `);
-    return rows;
+
+    return agruparVentas(rows);
 }
 
 export async function obtenerVentasPorSucursal(idSucursal) {
     const [rows] = await pool.query(`
         SELECT 
-            -- Datos de la venta
             v.id_venta,
             v.tipo_venta,
             v.metodo_pago_venta,
@@ -115,28 +104,19 @@ export async function obtenerVentasPorSucursal(idSucursal) {
             v.total_pagar,
             v.monto_recivido,
             v.vuelto,
-
-            -- Sucursal
             s.id_sucursal,
             s.nombre_suc AS sucursal,
             s.ubicacion_suc,
-
-            -- Quien registró la venta
             u.id_usuario,
             CONCAT(p.nombre_per, ' ', p.apellido_per) AS nombre_vendedor,
             p.dni_per,
-
-            -- Detalles de la venta
             dv.id_detalles_venta,
             dv.cantidad_dv,
             dv.sub_total_dv,
             dv.fecha_dv,
-
-            -- Producto
             pr.id_producto,
             pr.nombre_prod,
             pr.precio_unitario_prod
-
         FROM ventas v
         INNER JOIN usuarios_sucursal us ON v.usuarios_sucursal_id_usuarios_sucursal = us.id_usuarios_sucursal
         INNER JOIN usuarios u ON us.usuarios_id_usuario = u.id_usuario
@@ -144,10 +124,50 @@ export async function obtenerVentasPorSucursal(idSucursal) {
         INNER JOIN sucursales s ON us.sucursales_id_sucursal = s.id_sucursal
         INNER JOIN detalles_ventas dv ON v.id_venta = dv.ventas_id_venta
         INNER JOIN productos pr ON dv.productos_id_producto = pr.id_producto
-
         WHERE s.id_sucursal = ?
-
         ORDER BY v.fecha_venta DESC
     `, [idSucursal]);
-    return rows;
+
+    return agruparVentas(rows);
+}
+
+// --- Helper para agrupar filas planas en JSON anidado ---
+function agruparVentas(rows) {
+    const ventasMap = new Map();
+
+    for (const row of rows) {
+        if (!ventasMap.has(row.id_venta)) {
+            ventasMap.set(row.id_venta, {
+                id_venta: row.id_venta,
+                tipo_venta: row.tipo_venta,
+                metodo_pago_venta: row.metodo_pago_venta,
+                fecha_venta: row.fecha_venta,
+                total_pagar: row.total_pagar,
+                monto_recivido: row.monto_recivido,
+                vuelto: row.vuelto,
+                vendedor: {
+                    id_usuario: row.id_usuario,
+                    nombre_completo: row.nombre_completo ?? row.nombre_vendedor,
+                    // dni_per: row.dni_per ?? null,
+                    sucursal: row.sucursal,
+                    // ubicacion_suc: row.ubicacion_suc ?? null,
+                },
+                detalles_ventas: []
+            });
+        }
+
+        ventasMap.get(row.id_venta).detalles_ventas.push({
+            id_detalles_venta: row.id_detalles_venta,
+            cantidad_dv: row.cantidad_dv,
+            sub_total_dv: row.sub_total_dv,
+            fecha_dv: row.fecha_dv,
+            producto: {
+                id_producto: row.id_producto,
+                nombre_prod: row.nombre_prod,
+                precio_unitario_prod: row.precio_unitario_prod
+            }
+        });
+    }
+
+    return Array.from(ventasMap.values());
 }
