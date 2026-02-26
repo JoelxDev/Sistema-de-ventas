@@ -43,3 +43,11 @@ export async function actualizarEstadoSucursal(id, estado) {
     );
     return result.affectedRows;
 }
+
+export async function obtenerUsuarioSucursal(idUsuarioSucursal) {
+    const [ row ] = await pool.query(
+        'SELECT * FROM usuarios_sucursal WHERE id_usuarios_sucursal = ?',
+         [idUsuarioSucursal]
+    )
+    return row[0]
+}

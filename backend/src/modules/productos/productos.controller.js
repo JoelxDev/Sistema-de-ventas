@@ -85,3 +85,16 @@ export async function actualizarEstadoProducto(req, res) {
         res.status(500).json({ mensaje: "Error al actualizar estado del producto", error: error.message })
     }
 }
+
+export async function obtenerProductosActivos(req, res) {
+    try{
+        const productosActivos = await ProductoModel.obtenerProductosActivos()
+        if(!productosActivos) {
+            return res.status(404).json({ mensaje: "No hay productos activos" });
+        }
+        res.json(productosActivos)
+    }catch(error){
+        console.log("Error al obtener los productos activos:". error)
+        res.status(500).json({ mensaje: "Error al obtener los productos activoss", error: error.message})
+    }
+}

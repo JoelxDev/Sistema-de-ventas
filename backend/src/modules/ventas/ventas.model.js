@@ -1,10 +1,16 @@
 import pool from '../../config/conexion_bd.js';
 import { obtenerProductoPorId } from '../productos/productos.model.js';
-
+import { obtenerUsuarioSucursal } from '../sucursales/sucursales.model.js';
 
 export async function crearVenta(datos, idUsuarioSucursal) {
     const conecction = await pool.getConnection();
     const { tipo_venta, metodo_pago_venta, total_pagar, monto_recivido, detalles_ventas } = datos
+
+    const usuarioSucursal = await obtenerUsuarioSucursal(idUsuarioSucursal)
+
+    if(!usuarioSucursal.sucursales_id_sucursal){
+         throw new Error("Para registrar una venta tiene que estar asociado a una sucursal");
+    }
 
     if (total_pagar > monto_recivido) {
         throw new Error("El monto recibido no puede ser menor al total a pagar");
@@ -23,6 +29,7 @@ export async function crearVenta(datos, idUsuarioSucursal) {
         } else {
             vuelto = monto_recivido - total_pagar;
         }
+
 
         const [Resultventa] = await conecction.query(
             'INSERT INTO ventas (tipo_venta, metodo_pago_venta, fecha_venta, total_pagar, monto_recivido, vuelto, usuarios_sucursal_id_usuarios_sucursal) VALUES (?, ?, NOW(), ?, ?, ?, ?)',

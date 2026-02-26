@@ -7,6 +7,7 @@ const router = Router()
 
 router.post('/', ProductoController.crearProducto)
 router.get('/', ProductoController.obtenerProductos)
+router.get('/activos', ProductoController.obtenerProductosActivos)
 router.get('/:idProducto', ProductoController.obtenerProductoPorId)
 router.put('/:idProducto', ProductoController.actualizarProducto)
 router.delete('/:idProducto', ProductoController.eliminarProducto)

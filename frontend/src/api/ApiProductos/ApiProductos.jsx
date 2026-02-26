@@ -52,3 +52,10 @@ export async function actualizarEstadoProducto(idProducto, estadoProducto) {
     if (!response.ok) throw new Error('Error al actualizar estado del producto')
     return response.json();
 }
+
+export async function obtenerProductosActivos() {
+    const response = await fetch(`${API_PRODUCTOS_URL}/activos`, {credentials: 'include'});
+    if (!response.ok) throw new Error('Error al obtener productos activos')
+    return response.json();
+    
+}

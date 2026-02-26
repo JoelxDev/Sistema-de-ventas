@@ -8,6 +8,7 @@ import { RutasSucursales } from './pages/Sucursales/RutasSucursal.jsx';
 import { RutasSesiones } from './pages/Sesiones/RutasSesiones.jsx';
 import { RutasCategorias } from './pages/Categorias/RutasCategoria.jsx';
 import { RutasProductos } from './pages/Productos/RutasProductos.jsx';
+import { RutasVentas } from './pages/Ventas/RutasVentas.jsx';
 
 import { useAutenticacion } from './context/AutenticacionContext.jsx';
 import { Login } from './pages/Login/Login.jsx';
@@ -42,6 +43,7 @@ function App() {
         { RutasSesiones }
         { RutasCategorias }
         { RutasProductos }
+        { RutasVentas }
       </Route>
       {/* Redirigir raiz a login */}
       <Route path="/" element={<Navigate to="/login"/>}/>

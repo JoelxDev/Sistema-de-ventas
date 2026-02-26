@@ -3,6 +3,7 @@ import * as VentasModel from './ventas.model.js';
 export async function crearVenta(req, res) {
     try {
         const { idUsuarioSucursal } = req.usuario;
+        // if ()
         const idVenta = await VentasModel.crearVenta(req.body, idUsuarioSucursal);
         res.status(201).json({ id: idVenta, mensaje: "Venta creada exitosamente" });
     } catch (error) {
