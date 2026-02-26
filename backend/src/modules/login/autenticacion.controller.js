@@ -11,10 +11,22 @@ export async function login(req, res) {
         }
         // Usamos el modelo autenticacion
         const usuario =  await LoginModel.loginSesion(nombre_usuario, contrasenia, sucursalLogin);
-
+        
+        // ✅ Si había una sesión activa en la cookie, cerrarla antes de crear una nueva
+        const tokenAnterior = req.cookies?.token;
+        if (tokenAnterior) {
+            try {
+                const decoded = jwt.decode(tokenAnterior);
+                if (decoded?.idSesion) {
+                    await registrarFinSesion(decoded.idSesion);
+                    console.log(`✅ Sesión anterior ${decoded.idSesion} cerrada`);
+                }
+            } catch (err) {
+                console.error("❌ Error al cerrar sesión anterior:", err.message);
+            }
+        }
+        
         // Registramos la sesion usando el modelo sesiones
-
-
         const { idUsuarioSucursal, idSesion } = await registrarUsuarioSucursal(usuario.id_usuario, sucursalLogin);
 
         // Crear el token JWT
