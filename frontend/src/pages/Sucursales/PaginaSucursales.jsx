@@ -122,7 +122,7 @@ export function PaginaSucursales() {
                             <select
                                 value={suc.estado_suc}
                                 onChange={(e) => manejarCambioEstado(suc.id_sucursal, e.target.value)}
-                                className={`select-estado ${suc.estado}`}
+                                className={`select-estado ${suc.estado_suc}`}
                             >
                                 <option value="activo">Activo</option>
                                 <option value="inactivo">Inactivo</option>
@@ -150,8 +150,8 @@ export function PaginaSucursales() {
             {modalAbierto && (
                 <Modal
                     isOpen={modalAbierto}
-                    onCancelar={cerrarModal}
-                    titulo={idEditar ? "Editar Sucursal" : "Aniadir Sucursal"}
+                    onClose={cerrarModal}
+                    titulo={idEditar ? "Editar Sucursal" : "Agregar Sucursal"}
                 >
                     <FormularioSucursal
                         idSucursal={idEditar}

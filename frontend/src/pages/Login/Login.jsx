@@ -16,7 +16,6 @@ export function Login() {
         e.preventDefault();
         setError('');
         setCargando(true);
-
         try {
             await login(nombreUsuario, contrasenia, sucursalLogin);
             navegar('/dashboard');
@@ -28,67 +27,65 @@ export function Login() {
     }
 
     return (
-        <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            minHeight: '100vh' 
-        }}>
-            <form onSubmit={manejarEnvio} style={{ 
-                padding: '30px', 
-                border: '1px solid #ccc', 
-                borderRadius: '8px',
-                width: '300px'
-            }}>
-                <h2 style={{ textAlign: 'center' }}>Iniciar Sesión</h2>
-
-                {error && (
-                    <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>
-                )}
-
-                <div style={{ marginBottom: '15px' }}>
-                    <label>Usuario</label><br />
-                    <input
-                        type="text"
-                        value={nombreUsuario}
-                        onChange={(e) => setNombreUsuario(e.target.value)}
-                        required
-                        style={{ width: '100%', padding: '8px' }}
-                    />
+        <div className="login-pagina">
+            <div className="login-card">
+                <div className="login-brand">
+                    {/* <span className="login-brand-icon">📦</span> */}
+                    {/* <h1 className="login-titulo">Logística de Almacén</h1> */}
+                    <p className="login-subtitulo">Ingresa tus credenciales para continuar</p>
                 </div>
 
-                <div style={{ marginBottom: '15px' }}>
-                    <label>Contraseña</label><br />
-                    <input
-                        type="password"
-                        value={contrasenia}
-                        onChange={(e) => setContrasenia(e.target.value)}
-                        required
-                        style={{ width: '100%', padding: '8px' }}
-                    />
-                </div>
-                
-                <div style={{ marginBottom: '15px' }}>
-                    <label>Sucursal</label><br />
-                    <input
-                        type="number"
-                        value={sucursalLogin}
-                        onChange={(e) => {
-                            const value = e.target.value;
-                            setSucursalLogin(value === '' ? '' : Number(value))
-                        }}
-                        style={{ width: '100%', padding: '8px' }}
-                    />
-                </div>
+                {error && <div className="login-error">{error}</div>}
 
-                <button 
-                    type="submit" 
-                    disabled={cargando}
-                    style={{ width: '100%', padding: '10px' }}
-                >
-                    {cargando ? 'Ingresando...' : 'Ingresar'}
-                </button>
-            </form>
+                <form onSubmit={manejarEnvio}>
+                    <div className="campo">
+                        <label className="campo-label">Usuario</label>
+                        <input
+                            className="campo-input"
+                            type="text"
+                            value={nombreUsuario}
+                            onChange={(e) => setNombreUsuario(e.target.value)}
+                            placeholder="Nombre de usuario"
+                            required
+                            autoFocus
+                        />
+                    </div>
+
+                    <div className="campo">
+                        <label className="campo-label">Contraseña</label>
+                        <input
+                            className="campo-input"
+                            type="password"
+                            value={contrasenia}
+                            onChange={(e) => setContrasenia(e.target.value)}
+                            placeholder="Contraseña"
+                            required
+                        />
+                    </div>
+
+                    <div className="campo">
+                        <label className="campo-label">Sucursal</label>
+                        <input
+                            className="campo-input"
+                            type="number"
+                            value={sucursalLogin}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setSucursalLogin(value === '' ? '' : Number(value));
+                            }}
+                            placeholder="ID de sucursal"
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="btn-login"
+                        disabled={cargando}
+                    >
+                        {cargando ? 'Ingresando...' : 'Ingresar'}
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }

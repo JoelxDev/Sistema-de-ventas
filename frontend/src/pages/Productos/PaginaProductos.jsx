@@ -14,9 +14,7 @@ export function PaginaProductos() {
     const [modalAbierto, setModalAbierto] = useState(false);
     const [idEditar, setIdEditar] = useState(null);
 
-    useEffect(() => {
-        cargarProductos();
-    }, []);
+    useEffect(() => { cargarProductos(); }, []);
 
     async function cargarProductos() {
         try {
@@ -30,112 +28,107 @@ export function PaginaProductos() {
         }
     }
 
-    async function manejarCambioEstadoProducto(idProducto, nuevoEstadoPermiso) {
+    async function manejarCambioEstadoProducto(idProducto, nuevoEstado) {
         try {
-            await actualizarEstadoProducto(idProducto, nuevoEstadoPermiso);
+            await actualizarEstadoProducto(idProducto, nuevoEstado);
             setProductos(productos.map(prod =>
-                prod.id_producto === idProducto
-                    ? { ...prod, estado_prod: nuevoEstadoPermiso }
-                    : prod
+                prod.id_producto === idProducto ? { ...prod, estado_prod: nuevoEstado } : prod
             ));
-        } catch (err) {
-            setError(err.message);
-        }
+        } catch (err) { setError(err.message); }
     }
 
     async function manejarEliminacionProducto(idProducto) {
-        if (confirm('¿Estas seguro de eliminar este producto?')) {
+        if (confirm('¿Estás seguro de eliminar este producto?')) {
             try {
                 await eliminarProducto(idProducto);
                 cargarProductos();
-            } catch (err) {
-                setError(err.message);
-            }
+            } catch (err) { setError(err.message); }
         }
     }
 
-    function abrirModal() {
-        setIdEditar(null);
-        setModalAbierto(true);
-    }
+    function abrirModal() { setIdEditar(null); setModalAbierto(true); }
+    function abrirModalEditar(id) { setIdEditar(id); setModalAbierto(true); }
+    function cerrarModal() { setModalAbierto(false); setIdEditar(null); }
+    function manejarGuardado() { cerrarModal(); cargarProductos(); }
 
-    function abrirModalEditar(id) {
-        setIdEditar(id);
-        setModalAbierto(true);
-    }
-
-    function cerrarModal() {
-        setModalAbierto(false);
-        setIdEditar(null);
-    }
-
-    function manejarGuardado() {
-        cerrarModal();
-        cargarProductos();
-    }
-
-    if (cargando) return <p>Cargando permisos...</p>;
-    if (error) return <p>Error: {error}</p>;
+    if (cargando) return <div className="estado-cargando">⏳ Cargando productos...</div>;
+    if (error)    return <div className="estado-error">⚠️ Error: {error}</div>;
 
     return (
-        <div>
-            <h1>Productos</h1>
+        <div className="pagina">
+            <div className="pagina-header">
+                <h1 className="pagina-titulo">Productos</h1>
+                {tienePermiso('productos', 'Crear') && (
+                    <button className="btn btn-primario" onClick={abrirModal}>
+                        + Nuevo Producto
+                    </button>
+                )}
+            </div>
 
-            {tienePermiso('productos', 'Crear') && (
-                <button onClick={abrirModal}>Crear Permiso</button>
-            )}
-
-            <table border="1" cellPadding="8" cellSpacing="0" style={{ marginTop: "15px", width: "100%" }}>
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Descripcion</th>
-                        <th>Precio Unitario</th>
-                        <th>Categoria</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {productos.map((prod) => (
-                        <tr key={prod.id_producto}>
-                            <td>{prod.nombre_prod}</td>
-                            <td>{prod.descripcion_prod}</td>
-                            <td>{prod.precio_unitario_prod}</td>
-                            <td>{prod.nombre_categoria}</td>
-                            <td>
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name={`estado-${prod.id_producto}`}
-                                        checked={prod.estado_prod === 'activo'}
-                                        onChange={() => manejarCambioEstadoProducto(prod.id_producto, 'activo')}
-                                    />
-                                    Activo
-                                </label>
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name={`estado-${prod.id_producto}`}
-                                        checked={prod.estado_prod === 'inactivo'}
-                                        onChange={() => manejarCambioEstadoProducto(prod.id_producto, 'inactivo')}
-                                    />
-                                    Inactivo
-                                </label>
-                            </td>
-                            <td>
-                                <button onClick={() => abrirModalEditar(prod.id_producto)}>Editar</button>{" | "}
-                                <button onClick={() => manejarEliminacionProducto(prod.id_producto)}>Eliminar</button>
-                            </td>
+            <div className="tabla-wrapper">
+                <table className="tabla">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Descripción</th>
+                            <th>Precio Unitario</th>
+                            <th>Categoría</th>
+                            {tienePermiso('productos', 'Estados') && <th>Estado</th>}
+                            {(tienePermiso('productos', 'Editar') || tienePermiso('productos', 'Eliminar')) && <th>Acciones</th>}
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-            {/* Modal */}
+                    </thead>
+                    <tbody>
+                        {productos.map((prod) => (
+                            <tr key={prod.id_producto}>
+                                <td style={{ fontWeight: 600 }}>{prod.nombre_prod}</td>
+                                <td style={{ color: 'var(--color-text-muted)', maxWidth: 200 }}>{prod.descripcion_prod || '—'}</td>
+                                <td>S/ {parseFloat(prod.precio_unitario_prod).toFixed(2)}</td>
+                                <td>{prod.nombre_categoria}</td>
+                                {tienePermiso('productos', 'Estados') && (
+                                    <td>
+                                        <select
+                                            value={prod.estado_prod}
+                                            onChange={(e) => manejarCambioEstadoProducto(prod.id_producto, e.target.value)}
+                                            className={`select-estado-tabla ${prod.estado_prod}`}
+                                        >
+                                            <option value="activo">Activo</option>
+                                            <option value="inactivo">Inactivo</option>
+                                        </select>
+                                    </td>
+                                )}
+                                {(tienePermiso('productos', 'Editar') || tienePermiso('productos', 'Eliminar')) && (
+                                    <td>
+                                        <div className="acciones-tabla">
+                                            {tienePermiso('productos', 'Editar') && (
+                                                <button className="btn-icono btn-icono-editar" onClick={() => abrirModalEditar(prod.id_producto)}>
+                                                    ✏️ Editar
+                                                </button>
+                                            )}
+                                            {tienePermiso('productos', 'Eliminar') && (
+                                                <button className="btn-icono btn-icono-eliminar" onClick={() => manejarEliminacionProducto(prod.id_producto)}>
+                                                    🗑️ Eliminar
+                                                </button>
+                                            )}
+                                        </div>
+                                    </td>
+                                )}
+                            </tr>
+                        ))}
+                        {productos.length === 0 && (
+                            <tr>
+                                <td colSpan="6" style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '32px' }}>
+                                    No hay productos registrados.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
             <Modal
                 isOpen={modalAbierto}
                 onCancelar={cerrarModal}
-                titulo={idEditar ? "Editar Producto" : "Crear Producto"}
+                titulo={idEditar ? "Editar Producto" : "Nuevo Producto"}
             >
                 <FormularioProductos
                     id={idEditar}
@@ -144,5 +137,5 @@ export function PaginaProductos() {
                 />
             </Modal>
         </div>
-    )
+    );
 }
