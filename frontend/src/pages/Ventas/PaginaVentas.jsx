@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { obtenerVentas } from "../../api/ApiVentas/ApiVentas";
+import { obtenerVentas, obtenerVentasPorSucursal } from "../../api/ApiVentas/ApiVentas";
+import { obtenerSucursalesActivas } from "../../api/ApiSucursales/ApiSucursales";
 import { FormularioVentas } from "./FormularioVentas"
 import { useAutenticacion } from "../../context/AutenticacionContext";
 import { Modal } from "../../components/Modal";
@@ -8,20 +9,54 @@ export function PaginaVentas() {
     const [ventas, setVentas] = useState([])
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
+    const [sucursales, setSucursales] = useState(null);
+    const [sucursalSeleccionada, setSucursalSeleccionada] = useState(null);
 
     const { tienePermiso } = useAutenticacion()
     const [modalAbierto, setModalAbierto] = useState(false);
     const [idEditar, setIdEditar] = useState(null);
 
     useEffect(() => {
-        cargarVentas()
+        cargarSucursalesActivas()
     }, [])
+
+    useEffect(() => {
+        if (sucursalSeleccionada) {
+            cargarVentasPorSucursal(sucursalSeleccionada);
+        } else {
+            cargarVentas();
+        }
+    },[sucursalSeleccionada])
 
     async function cargarVentas() {
         try {
             setCargando(true)
             const data = await obtenerVentas()
             setVentas(data)
+        } catch (err) {
+            setError(err.message)
+        } finally {
+            setCargando(false)
+        }
+    }
+
+    async function cargarVentasPorSucursal(idScursal) {
+        try{
+            setCargando(true)
+            const data = await obtenerVentasPorSucursal(idScursal)
+            setVentas(data)
+        } catch (err) {
+            setError(err.message)
+        } finally {
+            setCargando(false)
+        }
+    }
+
+    async function cargarSucursalesActivas() {
+        try {
+            setCargando(true)
+            const data = await obtenerSucursalesActivas()
+            setSucursales(data)
         } catch (err) {
             setError(err.message)
         } finally {
@@ -59,6 +94,33 @@ export function PaginaVentas() {
             {tienePermiso('ventas', 'Crear') && (
                 <button onClick={abrirModal}>Registrar Venta</button>
             )}
+
+            <div>
+                <button
+                    onClick={() => setSucursalSeleccionada(null)}
+                    style={{ fontWeight: sucursalSeleccionada === null ? 'bold' : 'normal' }}
+                >
+                    Todas
+                </button>
+                {sucursales.map((suc) => (
+                    <button
+                        key={suc.id_sucursal}
+                        onClick={() => setSucursalSeleccionada(suc.id_sucursal)}
+                        style={{ fontWeight: sucursalSeleccionada === suc.id_sucursal ? 'bold' : 'normal' }}
+                    >
+                        {suc.nombre_suc}
+                    </button>
+                ))}
+            </div>
+            {/* Indicador de sucursal activa */}
+            <p>
+                Mostrando: <strong>
+                    {sucursalSeleccionada
+                        ? sucursales.find(s => s.id_sucursal === sucursalSeleccionada)?.nombre_suc
+                        : 'Todas las sucursales'}
+                </strong>
+            </p>
+
 
             <table border="1" cellPadding="8" cellSpacing="0" style={{ marginTop: "15px", width: "100%" }}>
                 <thead>

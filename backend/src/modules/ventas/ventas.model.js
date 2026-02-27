@@ -30,13 +30,18 @@ export async function crearVenta(datos, idUsuarioSucursal) {
             vuelto = monto_recivido - total_pagar;
         }
 
+        // const estadoRegistroVenta = estadoRegistro;
+
+        // if(estadoRegistroVenta !== 'editar'){
+        //     estadoRegistroVenta = 'original';
+        // }
 
         const [Resultventa] = await conecction.query(
-            'INSERT INTO ventas (tipo_venta, metodo_pago_venta, fecha_venta, total_pagar, monto_recivido, vuelto, usuarios_sucursal_id_usuarios_sucursal) VALUES (?, ?, NOW(), ?, ?, ?, ?)',
-            [tipo_venta, metodo_pago_venta, total_pagar, monto_recivido, vuelto, idUsuarioSucursal]
+            'INSERT INTO ventas (tipo_venta, metodo_pago_venta, fecha_venta, total_pagar, monto_recivido, vuelto, estado_registro_venta,usuarios_sucursal_id_usuarios_sucursal) VALUES (?, ?, NOW(), ?, ?, ?, ?, ?)',
+            [tipo_venta, metodo_pago_venta, total_pagar, monto_recivido, vuelto, 'original' ,idUsuarioSucursal]
         );
 
-        const idVenta = Resultventa.insertId;
+        const idVenta = Resultventa.insertId;``
 
         for (const detalle of detalles_ventas) {
             const { cantidad_prod, sub_total, productos_id_producto } = detalle;

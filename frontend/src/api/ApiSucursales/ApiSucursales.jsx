@@ -58,3 +58,10 @@ export async function actualizarEstadoSucursal(id, estado) {
     return response.json();
 }
 
+export async function obtenerSucursalesActivas() {
+    const response = await fetch(`${API_URL_SUCURSALES}/activas`, {
+        credentials: 'include'
+    });
+    if(!response.ok) throw new Error('Error al obtener sucursales activas');
+    return response.json();
+}

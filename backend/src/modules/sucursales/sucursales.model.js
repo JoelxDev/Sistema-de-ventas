@@ -51,3 +51,8 @@ export async function obtenerUsuarioSucursal(idUsuarioSucursal) {
     )
     return row[0]
 }
+
+export async function obtenerSucursalesActivas() {
+    const [rows] = await pool.query('SELECT * FROM sucursales WHERE estado_suc = "activo"');
+    return rows;
+}

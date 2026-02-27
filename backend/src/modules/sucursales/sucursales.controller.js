@@ -86,3 +86,13 @@ export async function actualizarEstadoSucursal(req, res) {
         res.status(500).json({ mensaje: "Error al actualizar el estado de la sucursal", error: error.message });
     }
 }
+
+export async function obtenerSucursalesActivas(req, res) {
+    try {
+        const sucursales = await SucursalModel.obtenerSucursalesActivas();
+        res.json(sucursales);
+    } catch (error) {
+        console.error("❌ Error al obtener sucursales activas:", error);
+        res.status(500).json({ mensaje: "Error al obtener las sucursales activas", error: error.message });
+    }
+}
