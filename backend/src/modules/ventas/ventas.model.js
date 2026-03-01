@@ -183,3 +183,72 @@ function agruparVentas(rows) {
 
     return Array.from(ventasMap.values());
 }
+
+export async function obtenerVentasFiltradas(filtros = {}) {
+    const { tipo_venta, metodo_pago, fecha_desde, fecha_hasta, producto, id_sucursal } = filtros;
+
+    let where = ['1 = 1']; // base para concatenar condiciones
+    let params = [];
+
+    if (tipo_venta) {
+        where.push('v.tipo_venta = ?');
+        params.push(tipo_venta);
+    }
+
+    if (metodo_pago) {
+        where.push('v.metodo_pago_venta = ?');
+        params.push(metodo_pago);
+    }
+
+    if (fecha_desde) {
+        where.push('v.fecha_venta >= ?');
+        params.push(`${fecha_desde} 00:00:00`);
+    }
+
+    if (fecha_hasta) {
+        where.push('v.fecha_venta <= ?');
+        params.push(`${fecha_hasta} 23:59:59`);
+    }
+
+    if (producto) {
+        where.push('pr.nombre_prod LIKE ?');
+        params.push(`%${producto}%`);
+    }
+
+    if (id_sucursal) {
+        where.push('s.id_sucursal = ?');
+        params.push(id_sucursal);
+    }
+
+    const [rows] = await pool.query(`
+        SELECT 
+            v.id_venta,
+            v.tipo_venta,
+            v.metodo_pago_venta,
+            v.fecha_venta,
+            v.total_pagar,
+            v.monto_recivido,
+            v.vuelto,
+            u.id_usuario,
+            CONCAT(p.nombre_per, ' ', p.apellido_per) AS nombre_completo,
+            s.nombre_suc AS sucursal,
+            dv.id_detalles_venta,
+            dv.cantidad_dv,
+            dv.sub_total_dv,
+            dv.fecha_dv,
+            pr.id_producto,
+            pr.nombre_prod,
+            pr.precio_unitario_prod
+        FROM ventas v
+        INNER JOIN usuarios_sucursal us ON v.usuarios_sucursal_id_usuarios_sucursal = us.id_usuarios_sucursal
+        INNER JOIN usuarios u ON us.usuarios_id_usuario = u.id_usuario
+        INNER JOIN personal p ON u.personal_id_personal = p.id_personal
+        INNER JOIN sucursales s ON us.sucursales_id_sucursal = s.id_sucursal
+        INNER JOIN detalles_ventas dv ON v.id_venta = dv.ventas_id_venta
+        INNER JOIN productos pr ON dv.productos_id_producto = pr.id_producto
+        WHERE ${where.join(' AND ')}
+        ORDER BY v.fecha_venta DESC
+    `, params);
+
+    return agruparVentas(rows);
+}

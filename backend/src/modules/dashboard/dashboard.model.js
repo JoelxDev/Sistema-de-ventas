@@ -72,7 +72,7 @@ export async function obtenerVentasPorPeriodo(periodo = 'mes') {
     switch (periodo) {
         case 'semana':
             // Últimas 12 semanas
-            selectFecha = `DATE_FORMAT(DATE_SUB(v.fecha_venta, INTERVAL WEEKDAY(v.fecha_venta) DAY), '%Y-%m-%d') AS periodo_inicio,
+            selectFecha = `DATE_FORMAT(MIN(DATE_SUB(v.fecha_venta, INTERVAL WEEKDAY(v.fecha_venta) DAY)), '%Y-%m-%d') AS periodo_inicio,
                            YEARWEEK(v.fecha_venta, 1) AS periodo_key`;
             groupBy = 'YEARWEEK(v.fecha_venta, 1)';
             orderBy = 'periodo_key ASC';
@@ -114,7 +114,7 @@ export async function obtenerVentasPorSucursalYPeriodo(periodo = 'mes') {
 
     switch (periodo) {
         case 'semana':
-            selectFecha = `DATE_FORMAT(DATE_SUB(v.fecha_venta, INTERVAL WEEKDAY(v.fecha_venta) DAY), '%Y-%m-%d') AS periodo_inicio,
+            selectFecha = `DATE_FORMAT(MIN(DATE_SUB(v.fecha_venta, INTERVAL WEEKDAY(v.fecha_venta) DAY)), '%Y-%m-%d') AS periodo_inicio,
                            YEARWEEK(v.fecha_venta, 1) AS periodo_key`;
             groupByPeriodo = 'YEARWEEK(v.fecha_venta, 1)';
             orderBy = 'periodo_key ASC';

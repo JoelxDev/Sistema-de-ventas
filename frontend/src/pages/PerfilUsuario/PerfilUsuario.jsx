@@ -6,9 +6,9 @@ export function PerfilUsuario() {
   if (!usuario) return <div className="estado-cargando">Cargando perfil...</div>;
 
   const iniciales = [
-    usuario.nombre_per?.[0] ?? '',
-    usuario.apellido_per?.[0] ?? ''
-  ].join('').toUpperCase() || (usuario.nombre_usuario?.[0] ?? '👤').toUpperCase();
+    usuario.nombre?.[0] ?? '',
+    usuario.apellido?.[0] ?? ''
+  ].join('').toUpperCase() || (usuario.usuario?.[0] ?? '👤').toUpperCase();
 
   return (
     <div className="pagina">
@@ -21,13 +21,13 @@ export function PerfilUsuario() {
         <div className="perfil-avatar-card">
           <div className="perfil-avatar">{iniciales}</div>
           <p className="perfil-nombre">
-            {usuario.nombre_per} {usuario.apellido_per}
+            {usuario.nombre} {usuario.apellido}
           </p>
-          {usuario.nombre_rol && (
-            <span className="perfil-rol">{usuario.nombre_rol}</span>
+          {usuario.rol && (
+            <span className="perfil-rol">{usuario.rol}</span>
           )}
-          {usuario.nombre_suc && (
-            <span className="perfil-sucursal">🏪 {usuario.nombre_suc}</span>
+          {usuario.sucursal && (
+            <span className="perfil-sucursal">🏪 {usuario.sucursal}</span>
           )}
         </div>
 

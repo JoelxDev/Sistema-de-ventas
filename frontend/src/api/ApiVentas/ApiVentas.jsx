@@ -24,3 +24,19 @@ export async function crearVenta(datos) {
     return response.json()
 }
 
+export async function obtenerVentasFiltradas(filtros = {}) {
+    const params = new URLSearchParams();
+
+    Object.entries(filtros).forEach(([key, value]) => {
+        if (value !== null && value !== '' && value !== undefined) {
+            params.append(key, value);
+        }
+    });
+
+    const respuesta = await fetch(`${API_VENTAS_URL}/filtrar?${params.toString()}`, {
+        credentials: 'include',
+    });
+
+    if (!respuesta.ok) throw new Error('Error al filtrar ventas');
+    return respuesta.json();
+}

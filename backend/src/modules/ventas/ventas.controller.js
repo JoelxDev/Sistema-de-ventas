@@ -38,3 +38,22 @@ export async function obtenerVentasPorSucursal(req, res) {
         res.status(500).json({ error: 'Error al obtener las ventas', mensaje: error.message });
     }
 }
+
+export async function obtenerVentasFiltradas(req, res) {
+    try {
+        const filtros = {
+            tipo_venta: req.query.tipo_venta || null,
+            metodo_pago: req.query.metodo_pago || null,
+            fecha_desde: req.query.fecha_desde || null,
+            fecha_hasta: req.query.fecha_hasta || null,
+            producto: req.query.producto || null,
+            id_sucursal: req.query.id_sucursal || null,
+        };
+
+        const ventas = await VentasModel.obtenerVentasFiltradas(filtros);
+        res.status(200).json(ventas);
+    } catch (error) {
+        console.error("❌ Error al filtrar ventas:", error);
+        res.status(500).json({ error: 'Error al filtrar las ventas', mensaje: error.message });
+    }
+}
