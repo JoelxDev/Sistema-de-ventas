@@ -133,7 +133,6 @@ export function FormularioUsuarioModal({id, onGuardar, onCancelar}) {
           name="correo_elect_per"
           value={datosFormulario.correo_elect_per}
           onChange={manejarCambio}
-          required
         />
       </div>
 

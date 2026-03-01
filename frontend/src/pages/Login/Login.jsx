@@ -18,7 +18,7 @@ export function Login() {
         setCargando(true);
         try {
             await login(nombreUsuario, contrasenia, sucursalLogin);
-            navegar('/dashboard');
+            navegar('/perfil');
         } catch (err) {
             setError(err.message);
         } finally {

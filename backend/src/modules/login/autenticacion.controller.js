@@ -1,5 +1,6 @@
 import * as LoginModel from './autenticacion.model.js';
 import { registrarUsuarioSucursal, registrarFinSesion } from '../sesiones/sesiones.model.js';
+import { obtenerSucursalPorId } from '../sucursales/sucursales.model.js'
 import jwt from 'jsonwebtoken';
 
 export async function login(req, res) {
@@ -11,6 +12,15 @@ export async function login(req, res) {
         }
         // Usamos el modelo autenticacion
         const usuario =  await LoginModel.loginSesion(nombre_usuario, contrasenia, sucursalLogin);
+
+        const sucursal  = await obtenerSucursalPorId(sucursalLogin);
+
+        let nombreSucursal
+        if(sucursal){
+            const { nombre_suc } = sucursal;
+            nombreSucursal = nombre_suc
+        }
+
         
         // ✅ Si había una sesión activa en la cookie, cerrarla antes de crear una nueva
         const tokenAnterior = req.cookies?.token;
@@ -34,6 +44,11 @@ export async function login(req, res) {
             {
                 id: usuario.id_usuario,
                 usuario: usuario.nombre_usuario,
+                nombre: usuario.nombre_personal,
+                apellido: usuario.apellido_personal,
+                telefono: usuario.telefono_personal,
+                correo: usuario.correo_personal??'------------',
+                sucursal : nombreSucursal,
                 rol: usuario.nombre_rol,
                 permisos: usuario.permisos,
                 idSesion,

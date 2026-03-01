@@ -37,35 +37,31 @@ export function PerfilUsuario() {
           <div className="perfil-campos">
             <div className="perfil-campo">
               <span className="perfil-campo-label">Usuario</span>
-              <span className="perfil-campo-valor">{usuario.nombre_usuario ?? '—'}</span>
+              <span className="perfil-campo-valor">{usuario.usuario ?? '—'}</span>
             </div>
             <div className="perfil-campo">
               <span className="perfil-campo-label">Rol</span>
-              <span className="perfil-campo-valor">{usuario.nombre_rol ?? '—'}</span>
+              <span className="perfil-campo-valor">{usuario.rol ?? '—'}</span>
             </div>
             <div className="perfil-campo">
               <span className="perfil-campo-label">Nombre</span>
-              <span className="perfil-campo-valor">{usuario.nombre_per ?? '—'}</span>
+              <span className="perfil-campo-valor">{usuario.nombre ?? '—'}</span>
             </div>
             <div className="perfil-campo">
               <span className="perfil-campo-label">Apellido</span>
-              <span className="perfil-campo-valor">{usuario.apellido_per ?? '—'}</span>
-            </div>
-            <div className="perfil-campo">
-              <span className="perfil-campo-label">DNI</span>
-              <span className="perfil-campo-valor">{usuario.dni_per ?? '—'}</span>
+              <span className="perfil-campo-valor">{usuario.apellido ?? '—'}</span>
             </div>
             <div className="perfil-campo">
               <span className="perfil-campo-label">Teléfono</span>
-              <span className="perfil-campo-valor">{usuario.telefono_per ?? '—'}</span>
+              <span className="perfil-campo-valor">{usuario.telefono ?? '—'}</span>
             </div>
             <div className="perfil-campo">
               <span className="perfil-campo-label">Correo</span>
-              <span className="perfil-campo-valor">{usuario.correo_elect_per ?? '—'}</span>
+              <span className="perfil-campo-valor">{usuario.correo ?? '—'}</span>
             </div>
             <div className="perfil-campo">
               <span className="perfil-campo-label">Sucursal</span>
-              <span className="perfil-campo-valor">{usuario.nombre_suc ?? 'Sin sucursal'}</span>
+              <span className="perfil-campo-valor">{usuario.sucursal ?? 'Sin sucursal'}</span>
             </div>
           </div>
         </div>

@@ -13,6 +13,9 @@ export async function loginSesion(nombre_usuario, contrasenia, sucursalLogin) {
             u.estado_usuario,
             u.roles_id_rol,
             p.nombre_per,
+            p.apellido_per,
+            p.telefono_per,
+            p.correo_elect_per,
             r.nombre_rol,
             r.requiere_sucursal
         FROM usuarios u
@@ -76,6 +79,9 @@ export async function loginSesion(nombre_usuario, contrasenia, sucursalLogin) {
             id_usuario: usuario.id_usuario,
             nombre_usuario: usuario.nombre_usuario,
             nombre_personal: usuario.nombre_per,
+            apellido_personal: usuario.apellido_per,
+            telefono_personal: usuario.telefono_per,
+            correo_personal: usuario.correo_elect_per,
             nombre_rol: usuario.nombre_rol,
             permisos: permisosEstructurados
         }
