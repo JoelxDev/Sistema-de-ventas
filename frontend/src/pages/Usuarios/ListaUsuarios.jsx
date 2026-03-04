@@ -3,11 +3,13 @@ import { obtenerPersonal, eliminarPersonalUsuario, actualizarEstadoUsuario } fro
 import { FormularioUsuarioModal } from './FormularioUsuarioModal';
 import { Modal } from '../../components/Modal';
 import { useAutenticacion } from '../../context/AutenticacionContext';
+import { useToast } from '../../context/ToastContext';
 
 export function ListaUsuarios() {
   const [personal, setPersonal] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const toast = useToast();
   const [modalAbierto, setModalAbierto] = useState(false);
   const [idEditar, setIdEditar] = useState(null);
   const { tienePermiso } = useAutenticacion();
@@ -19,19 +21,19 @@ export function ListaUsuarios() {
       setCargando(true);
       const data = await obtenerPersonal();
       setPersonal(data);
-    } catch (err) { setError(err.message); }
+    } catch (err) { setError(err.message); toast.error(err.message); }
     finally { setCargando(false); }
   }
 
   function abrirModalCrear() { setIdEditar(null); setModalAbierto(true); }
   function abrirModalEditar(id) { setIdEditar(id); setModalAbierto(true); }
   function cerrarModal() { setModalAbierto(false); setIdEditar(null); }
-  function manejarGuardado() { cerrarModal(); cargarPersonal(); }
+  function manejarGuardado() { cerrarModal(); cargarPersonal(); toast.exito(idEditar ? "Usuario actualizado correctamente" : "Usuario registrado correctamente"); }
 
   async function manejarEliminacion(id) {
     if (confirm('¿Estás seguro de eliminar este usuario?')) {
-      try { await eliminarPersonalUsuario(id); cargarPersonal(); }
-      catch (err) { setError(err.message); }
+      try { await eliminarPersonalUsuario(id); cargarPersonal(); toast.exito("Usuario eliminado correctamente"); }
+      catch (err) { setError(err.message); toast.error(err.message); }
     }
   }
 
@@ -39,7 +41,7 @@ export function ListaUsuarios() {
     try {
       await actualizarEstadoUsuario(id, nuevoEstado);
       setPersonal(personal.map(p => p.id_personal === id ? { ...p, estado_usuario: nuevoEstado } : p));
-    } catch (err) { setError(err.message); }
+    } catch (err) { setError(err.message); toast.error(err.message); }
   }
 
   if (cargando) return <div className="estado-cargando">⏳ Cargando usuarios...</div>;

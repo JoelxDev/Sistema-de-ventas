@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { FormularioRoles } from "./FormularioRoles";
 import { obtenerRoles, eliminarRol, actualizarEstadoRol, actualizarRequireSucursal } from "../../api/ApiRoles/ApiRoles";
 import { useAutenticacion } from "../../context/AutenticacionContext";
+import { useToast } from "../../context/ToastContext";
 
 export function Roles() {
   const [roles, setRoles] = useState([]);
@@ -12,6 +13,8 @@ export function Roles() {
   const { tienePermiso } = useAutenticacion();
   const [modalAbierto, setModalAbierto] = useState(false);
   const [idEditar, setIdEditar] = useState(null);
+
+  const toast = useToast()
 
   useEffect(() => { cargarRoles(); }, []);
 
@@ -27,12 +30,12 @@ export function Roles() {
   function abrirModalCrear() { setIdEditar(null); setModalAbierto(true); }
   function abrirModalEditarRol(id) { setIdEditar(id); setModalAbierto(true); }
   function cerrarModal() { setModalAbierto(false); setIdEditar(null); }
-  function manejarGuardado() { cerrarModal(); cargarRoles(); }
+  function manejarGuardado() { cerrarModal(); cargarRoles(); toast.exito(idEditar ? "Rol actualizado correctamente" : "Rol creado correctamente", 6000) }
 
   async function manejarEliminacionRol(id) {
     if (confirm('¿Estás seguro de eliminar este rol?')) {
-      try { await eliminarRol(id); cargarRoles(); }
-      catch (err) { setError(err.message); }
+      try { await eliminarRol(id); cargarRoles(); toast.exito("Rol eliminado correctamente", 6000) }
+      catch (err) { setError(err.message); toast.error(err.message, 6000)}
     }
   }
 
@@ -40,12 +43,13 @@ export function Roles() {
     try {
       await actualizarEstadoRol(id, nuevoEstado);
       setRoles(roles.map(r => r.id_rol === id ? { ...r, estado_rol: nuevoEstado } : r));
-    } catch (err) { setError(err.message); }
+      toast.info("Se cambio el estado correctamente", 6000)
+    } catch (err) { setError(err.message); toast.error(err.message, 6000)}
   }
 
   async function manejarRequiereSucursal(id, requireSucursal) {
-    try { await actualizarRequireSucursal(id, requireSucursal); cargarRoles(); }
-    catch (err) { setError(err.message); }
+    try { await actualizarRequireSucursal(id, requireSucursal); cargarRoles(); toast.info("Estado de requiere sucursal actualizado exitosamente", 6000) }
+    catch (err) { setError(err.message); toast.error(err.message, 6000)}
   }
 
   if (cargando) return <div className="estado-cargando">⏳ Cargando roles...</div>;

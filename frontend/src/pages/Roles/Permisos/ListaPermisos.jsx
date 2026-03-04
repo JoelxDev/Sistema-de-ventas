@@ -3,6 +3,7 @@ import { obtenerPermisos, eliminarPermiso, actualizarEstadoPermiso } from "../..
 import { FormularioPermisos } from "./FormularioPermisos.jsx";
 import { Modal } from "../../../components/Modal.jsx";
 import { useAutenticacion } from "../../../context/AutenticacionContext.jsx";
+import { useToast } from "../../../context/ToastContext.jsx";
 
 export function ListaPermisos() {
   const { tienePermiso } = useAutenticacion();
@@ -12,6 +13,8 @@ export function ListaPermisos() {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [idEditar, setIdEditar] = useState(null);
 
+  const toast = useToast()
+
   useEffect(() => { cargarPermisos(); }, []);
 
   async function cargarPermisos() {
@@ -19,7 +22,7 @@ export function ListaPermisos() {
       setCargando(true);
       const data = await obtenerPermisos();
       setPermisos(data);
-    } catch (err) { setError(err.message); }
+    } catch (err) { setError(err.message); toast.error(err.message, 6000) }
     finally { setCargando(false); }
   }
 
@@ -27,20 +30,21 @@ export function ListaPermisos() {
     try {
       await actualizarEstadoPermiso(id, nuevoEstado);
       setPermisos(permisos.map(p => p.id_permiso === id ? { ...p, estado_perm: nuevoEstado } : p));
-    } catch (err) { setError(err.message); }
+      toast.info("Estado del permiso actualizado exitosamente", 6000)
+    } catch (err) { setError(err.message); toast.error(err.message)}
   }
 
   async function manejarEliminacionPermiso(id) {
     if (confirm('¿Estás seguro de eliminar este permiso?')) {
-      try { await eliminarPermiso(id); cargarPermisos(); }
-      catch (err) { setError(err.message); }
+      try { await eliminarPermiso(id); cargarPermisos(); toast.exito("Permiso eliminado exitosamente", 6000)}
+      catch (err) { setError(err.message); toast.error(err.message, 6000)}
     }
   }
 
   function abrirModalCrearPermiso() { setIdEditar(null); setModalAbierto(true); }
   function abrirModalEditarPermiso(id) { setIdEditar(id); setModalAbierto(true); }
   function cerrarModal() { setModalAbierto(false); setIdEditar(null); }
-  function manejarGuardado() { cerrarModal(); cargarPermisos(); }
+  function manejarGuardado() { cerrarModal(); cargarPermisos(); toast.exito(idEditar ? "Permiso editado exitosamente" : "Permiso creado exitosamente", 6000)}
 
   if (cargando) return <div className="estado-cargando">⏳ Cargando permisos...</div>;
   if (error)    return <div className="estado-error">⚠️ Error: {error}</div>;

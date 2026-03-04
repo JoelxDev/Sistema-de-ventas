@@ -3,10 +3,12 @@ import { obtenerSucursales, eliminarSucursal, actualizarEstadoSucursal, obtenerS
 import { FormularioSucursal } from './FormularioSucursal'
 import { Modal } from "../../components/Modal"
 import { useAutenticacion } from "../../context/AutenticacionContext"
+import { useToast } from "../../context/ToastContext"
 import "../../css/PaginaSucursales.css"
 
 export function PaginaSucursales() {
 
+    const toast = useToast()
     const [sucursales, setSucursales] = useState([])
     const [cargando, setCargando] = useState(true)
     const [error, setError] = useState(null)
@@ -27,6 +29,7 @@ export function PaginaSucursales() {
             setSucursales(data);
         } catch (err) {
             setError(err.message);
+            toast.error(err.message)
         } finally {
             setCargando(false);
         }
@@ -47,6 +50,8 @@ export function PaginaSucursales() {
     function manejarGuardado() {
         cerrarModal();
         cargarSucursales();
+        toast.exito( idEditar ? "Sucursal editada exitosamente" : "Sucursal creada exitosamente", 6000)
+
     }
 
     async function manejarEliminacion(id) {
@@ -60,21 +65,26 @@ export function PaginaSucursales() {
                     try {
                         await eliminarSucursal(id);
                         cargarSucursales();
+                        toast.exito("Sucursal eliminada exitosamente", 6000)
                     } catch (err) {
                         setError(err.message);
+                        toast.error(err.message, 6000)
                     }
                 }
             } catch (err) {
                 setError(err.message);
+                toast.error(err.message, 6000)
             }
         }
 
     }
 
+
     async function manejarCambioEstado(id, nuevoEstado) {
         try {
             await actualizarEstadoSucursal(id, nuevoEstado);
             cargarSucursales();
+            toast.info("Se cambio el estado exitosamente", 6000)
             // setSucursales(sucursales.map(suc => {
             //     if (suc.id_sucursal === id) {
             //         return { ...suc, estado_suc: nuevoEstado };
@@ -83,6 +93,7 @@ export function PaginaSucursales() {
             // }));
         } catch (err) {
             setError(err.message);
+            toast.error(err.message, 6000)
         }
     }
 

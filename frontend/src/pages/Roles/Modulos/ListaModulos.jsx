@@ -3,8 +3,12 @@ import { obtenerModulos, eliminarModulo, actualizarEstadoModulo } from "../../..
 import { Modal } from "../../../components/Modal.jsx";
 import { FormularioModulos } from './FormularioModulos.jsx'
 import { useAutenticacion } from "../../../context/AutenticacionContext.jsx";
+import { useToast } from "../../../context/ToastContext.jsx";
 
 export function ListaModulos() {
+
+    const toast = useToast()
+
     const [modulos, setModulos] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
@@ -19,14 +23,14 @@ export function ListaModulos() {
             setCargando(true);
             const data = await obtenerModulos();
             setModulos(data);
-        } catch (err) { setError(err.message); }
+        } catch (err) { setError(err.message); toast.error(err.message, 6000) }
         finally { setCargando(false); }
     }
 
     async function manejarEliminacionModulo(id) {
-        if (confirm('Â¿EstÃ¡s seguro de eliminar este mÃ³dulo?')) {
-            try { await eliminarModulo(id); cargarModulos(); }
-            catch (err) { setError(err.message); }
+        if (confirm('Estas seguro de eliminar este modulo?')) {
+            try { await eliminarModulo(id); cargarModulos(); toast.exito("Modulo eliminado exitosamente", 6000)}
+            catch (err) { setError(err.message); toast.error(err.message, 6000) }
         }
     }
 
@@ -34,16 +38,17 @@ export function ListaModulos() {
         try {
             await actualizarEstadoModulo(id, nuevoEstado);
             setModulos(modulos.map(m => m.id_modulo === id ? { ...m, estado_modulo: nuevoEstado } : m));
-        } catch (err) { setError(err.message); }
+            toast.info("Estado del modulo actualizado exitosamente", 6000)
+        } catch (err) { setError(err.message); toast.error(err.message)}
     }
 
     function abrirModalCrearModulo() { setIdEditarModulo(null); setModalAbiertoModulo(true); }
     function abrirModalEditarPermiso(id) { setIdEditarModulo(id); setModalAbiertoModulo(true); }
     function cerrarModal() { setModalAbiertoModulo(false); setIdEditarModulo(null); }
-    function manejarGuardadoModulo() { cerrarModal(); cargarModulos(); }
+    function manejarGuardadoModulo() { cerrarModal(); cargarModulos(); toast.exito(idEditarModulo ? "Modulo editado exitosamente" : "Modulo creado exitosamente" )}
 
-    if (cargando) return <div className="estado-cargando">â³ Cargando mÃ³dulos...</div>;
-    if (error)    return <div className="estado-error">âš ï¸ Error: {error}</div>;
+    if (cargando) return <div className="estado-cargando">Cargando modulos...</div>;
+    if (error)    return <div className="estado-error">Error: {error}</div>;
 
     return (
         <div className="pagina">

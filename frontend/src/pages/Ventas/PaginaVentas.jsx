@@ -3,6 +3,7 @@ import { obtenerVentas, obtenerVentasPorSucursal, obtenerVentasFiltradas } from 
 import { obtenerSucursalesActivas } from "../../api/ApiSucursales/ApiSucursales";
 import { FormularioVentas } from "./FormularioVentas";
 import { useAutenticacion } from "../../context/AutenticacionContext";
+import { useToast } from "../../context/ToastContext";
 import { Modal } from "../../components/Modal";
 
 function formatearMoneda(valor) {
@@ -27,6 +28,7 @@ export function PaginaVentas() {
     const [filtrosAplicados, setFiltrosAplicados] = useState(false);
 
     const { tienePermiso } = useAutenticacion();
+    const toast = useToast();
     const [modalAbierto, setModalAbierto] = useState(false);
     const [idEditar, setIdEditar] = useState(null);
 
@@ -35,7 +37,8 @@ export function PaginaVentas() {
 
     async function cargarVentas() {
         try { setCargando(true); setVentas(await obtenerVentas()); setFiltrosAplicados(false); }
-        catch (err) { setError(err.message); } finally { setCargando(false); }
+        catch (err) { setError(err.message); toast.error(err.message); } 
+        finally { setCargando(false); }
     }
 
     async function cargarSucursalesActivas() {
@@ -74,7 +77,11 @@ export function PaginaVentas() {
     function abrirModal() { setIdEditar(null); setModalAbierto(true); }
     function abrirModalEditar(id) { setIdEditar(id); setModalAbierto(true); }
     function cerrarModal() { setModalAbierto(false); setIdEditar(null); }
-    function manejarGuardado() { cerrarModal(); cargarVentas(); }
+    function manejarGuardado() {
+        cerrarModal();
+        cargarVentas();
+        toast.exito(idEditar ? "Venta actualizada correctamente" : "Venta registrada correctamente");
+    }
 
     if (error) return <div className="estado-error">⚠️ Error: {error}</div>;
 

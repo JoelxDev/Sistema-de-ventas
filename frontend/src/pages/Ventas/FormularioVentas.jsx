@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { crearVenta } from "../../api/ApiVentas/ApiVentas";
 import { obtenerProductosActivos } from "../../api/ApiProductos/ApiProductos";
+import { useToast } from "../../context/ToastContext";
 
 const TIPOS_VENTA = ["Unica", "Multiple"];
 const METODOS_PAGO = ["Efectivo", "Tarjeta", "Transferencia", "Yape", "Plin"];
@@ -9,6 +10,7 @@ export function FormularioVentas({ idVenta, onGuardar, onCancelar }) {
     const [productos, setProductos] = useState([]);
     const [cargando, setCargando] = useState(false);
     const [error, setError] = useState(null);
+    const toast = useToast();
 
     const [tipoVenta, setTipoVenta] = useState("Unica");
     const [metodoPago, setMetodoPago] = useState("Efectivo");
@@ -109,6 +111,7 @@ export function FormularioVentas({ idVenta, onGuardar, onCancelar }) {
             onGuardar();
         } catch (err) {
             setError(err.message);
+            toast.error(err.message);
         } finally {
             setCargando(false);
         }
