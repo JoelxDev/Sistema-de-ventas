@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { obtenerPermisos, eliminarPermiso, actualizarEstadoPermiso } from "../../../api/ApiRoles/ApiPermisos/ApiPermisos.jsx";
 import { FormularioPermisos } from "./FormularioPermisos.jsx";
 import { Modal } from "../../../components/Modal.jsx";
@@ -46,6 +46,19 @@ export function ListaPermisos() {
   function cerrarModal() { setModalAbierto(false); setIdEditar(null); }
   function manejarGuardado() { cerrarModal(); cargarPermisos(); toast.exito(idEditar ? "Permiso editado exitosamente" : "Permiso creado exitosamente", 6000)}
 
+  const tieneAcciones = tienePermiso('permisos', 'Editar') || tienePermiso('permisos', 'Eliminar');
+  const totalColumnas = tieneAcciones ? 5 : 4;
+
+  const permisosAgrupados = useMemo(() => {
+    const grupos = {};
+    for (const perm of permisos) {
+      const modulo = perm.nombre_modulo || 'Sin módulo';
+      if (!grupos[modulo]) grupos[modulo] = [];
+      grupos[modulo].push(perm);
+    }
+    return Object.entries(grupos).sort(([a], [b]) => a.localeCompare(b));
+  }, [permisos]);
+
   if (cargando) return <div className="estado-cargando">⏳ Cargando permisos...</div>;
   if (error)    return <div className="estado-error">⚠️ Error: {error}</div>;
 
@@ -64,52 +77,75 @@ export function ListaPermisos() {
         <table className="tabla">
           <thead>
             <tr>
-              <th>Módulo</th>
               <th>Permiso</th>
               <th>Descripción</th>
               <th>Estado</th>
               <th>Fecha creación</th>
-              {(tienePermiso('permisos', 'Editar') || tienePermiso('permisos', 'Eliminar')) && <th>Acciones</th>}
+              {tieneAcciones && <th>Acciones</th>}
             </tr>
           </thead>
           <tbody>
-            {permisos.map((perm) => (
-              <tr key={perm.id_permiso}>
-                <td><span className="badge" style={{ background: 'var(--color-primary-light)', color: 'var(--color-primary-dark)' }}>{perm.nombre_modulo}</span></td>
-                <td style={{ fontWeight: 600 }}>{perm.nombre_perm}</td>
-                <td style={{ color: 'var(--color-text-muted)' }}>{perm.descripcion_perm || '—'}</td>
-                <td>
-                  <select
-                    value={perm.estado_perm}
-                    onChange={(e) => manejarCambioEstadoPermiso(perm.id_permiso, e.target.value)}
-                    className={`select-estado-tabla ${perm.estado_perm}`}
-                  >
-                    <option value="activo">Activo</option>
-                    <option value="inactivo">Inactivo</option>
-                  </select>
-                </td>
-                <td style={{ color: 'var(--color-text-muted)' }}>{new Date(perm.fecha_crea_perm).toLocaleDateString('es-ES')}</td>
-                {(tienePermiso('permisos', 'Editar') || tienePermiso('permisos', 'Eliminar')) && (
-                  <td>
-                    <div className="acciones-tabla">
-                      {tienePermiso('permisos', 'Editar') && (
-                        <button className="btn-icono btn-icono-editar" onClick={() => abrirModalEditarPermiso(perm.id_permiso)}>
-                          ✏️ Editar
-                        </button>
-                      )}
-                      {tienePermiso('permisos', 'Eliminar') && (
-                        <button className="btn-icono btn-icono-eliminar" onClick={() => manejarEliminacionPermiso(perm.id_permiso)}>
-                          🗑️ Eliminar
-                        </button>
-                      )}
-                    </div>
+            {permisosAgrupados.map(([modulo, permisosDelModulo]) => (
+              <>
+                <tr key={`grupo-${modulo}`} className="fila-grupo-modulo">
+                  <td colSpan={totalColumnas} style={{
+                    background: 'var(--color-primary-light, #e8f0fe)',
+                    fontWeight: 700,
+                    fontSize: '0.95rem',
+                    padding: '10px 16px',
+                    color: 'var(--color-primary-dark, #1a3b5c)',
+                    letterSpacing: '0.02em',
+                    borderLeft: '4px solid var(--color-primary, #3b82f6)'
+                  }}>
+                    📦 {modulo}
+                    <span style={{
+                      marginLeft: '10px',
+                      fontWeight: 400,
+                      fontSize: '0.82rem',
+                      color: 'var(--color-text-muted, #6b7280)'
+                    }}>
+                      ({permisosDelModulo.length} {permisosDelModulo.length === 1 ? 'permiso' : 'permisos'})
+                    </span>
                   </td>
-                )}
-              </tr>
+                </tr>
+                {permisosDelModulo.map((perm) => (
+                  <tr key={perm.id_permiso}>
+                    <td style={{ fontWeight: 600, paddingLeft: '28px' }}>{perm.nombre_perm}</td>
+                    <td style={{ color: 'var(--color-text-muted)' }}>{perm.descripcion_perm || '—'}</td>
+                    <td>
+                      <select
+                        value={perm.estado_perm}
+                        onChange={(e) => manejarCambioEstadoPermiso(perm.id_permiso, e.target.value)}
+                        className={`select-estado-tabla ${perm.estado_perm}`}
+                      >
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                      </select>
+                    </td>
+                    <td style={{ color: 'var(--color-text-muted)' }}>{new Date(perm.fecha_crea_perm).toLocaleDateString('es-ES')}</td>
+                    {tieneAcciones && (
+                      <td>
+                        <div className="acciones-tabla">
+                          {tienePermiso('permisos', 'Editar') && (
+                            <button className="btn-icono btn-icono-editar" onClick={() => abrirModalEditarPermiso(perm.id_permiso)}>
+                              ✏️ Editar
+                            </button>
+                          )}
+                          {tienePermiso('permisos', 'Eliminar') && (
+                            <button className="btn-icono btn-icono-eliminar" onClick={() => manejarEliminacionPermiso(perm.id_permiso)}>
+                              🗑️ Eliminar
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </>
             ))}
             {permisos.length === 0 && (
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '32px' }}>
+                <td colSpan={totalColumnas} style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '32px' }}>
                   No hay permisos registrados.
                 </td>
               </tr>

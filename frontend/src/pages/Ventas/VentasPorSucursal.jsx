@@ -235,7 +235,7 @@ export function VentasPorSucursal() {
                                 <th>Producto</th>
                                 <th>Precio U.</th>
                                 <th>Cant.</th>
-                                <th>Acciones</th>
+                                {/* <th>Acciones</th> */}
                             </tr>
                         </thead>
                         <tbody>
@@ -273,9 +273,9 @@ export function VentasPorSucursal() {
                                             {index === 0 && (
                                                 <td rowSpan={ven.detalles_ventas.length}>
                                                     <div className="acciones-tabla">
-                                                        <button className="btn-icono btn-icono-editar" onClick={() => abrirModalEditar(ven.id_venta)}>
+                                                        {/* <button className="btn-icono btn-icono-editar" onClick={() => abrirModalEditar(ven.id_venta)}>
                                                             Editar
-                                                        </button>
+                                                        </button> */}
                                                     </div>
                                                 </td>
                                             )}
@@ -293,9 +293,9 @@ export function VentasPorSucursal() {
                                             <td colSpan={3} style={{ color: 'var(--color-text-muted)' }}>Sin detalles</td>
                                             <td>
                                                 <div className="acciones-tabla">
-                                                    <button className="btn-icono btn-icono-editar" onClick={() => abrirModalEditar(ven.id_venta)}>
+                                                    {/* <button className="btn-icono btn-icono-editar" onClick={() => abrirModalEditar(ven.id_venta)}>
                                                         ✏️ Editar
-                                                    </button>
+                                                    </button> */}
                                                 </div>
                                             </td>
                                         </tr>

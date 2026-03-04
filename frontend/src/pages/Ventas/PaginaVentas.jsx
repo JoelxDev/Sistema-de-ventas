@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+﻿import { useState, useEffect, useMemo } from "react";
 import { obtenerVentasFiltradas } from "../../api/ApiVentas/ApiVentas";
 import { obtenerSucursalesActivas } from "../../api/ApiSucursales/ApiSucursales";
 import { FormularioVentas } from "./FormularioVentas";
@@ -41,6 +41,13 @@ export function PaginaVentas() {
     const toast = useToast();
     const [modalAbierto, setModalAbierto] = useState(false);
     const [idEditar, setIdEditar] = useState(null);
+    const [filtroPersonal, setFiltroPersonal] = useState('');
+
+    const ventasFiltradas = useMemo(() => {
+        if (!filtroPersonal.trim()) return ventas;
+        const texto = filtroPersonal.toLowerCase();
+        return ventas.filter(v => v.vendedor?.nombre_completo?.toLowerCase().includes(texto));
+    }, [ventas, filtroPersonal]);
 
     useEffect(() => { cargarSucursalesActivas(); }, []);
     useEffect(() => { cargarVentasDelDia(); }, []);
@@ -110,6 +117,7 @@ export function PaginaVentas() {
 
     function limpiarFiltros() {
         setFiltros(FILTROS_INICIALES);
+        setFiltroPersonal('');
         cargarVentasDelDia();
     }
 
@@ -209,6 +217,17 @@ export function PaginaVentas() {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Personal</label>
+                    <input
+                        type="text"
+                        className="input"
+                        placeholder="Buscar personal..."
+                        value={filtroPersonal}
+                        onChange={(e) => setFiltroPersonal(e.target.value)}
+                    />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Sucursal</label>
                     <select
                         className="input"
@@ -253,18 +272,18 @@ export function PaginaVentas() {
                                 <th>Producto</th>
                                 <th>Precio U.</th>
                                 <th>Cant.</th>
-                                <th>Acciones</th>
+                                {/* <th>Acciones</th> */}
                             </tr>
                         </thead>
                         <tbody>
-                            {ventas.length === 0 && (
+                            {ventasFiltradas.length === 0 && (
                                 <tr>
                                     <td colSpan="12" style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '32px' }}>
                                         No hay ventas {filtrosAplicados ? 'que coincidan con los filtros' : 'registradas'}.
                                     </td>
                                 </tr>
                             )}
-                            {ventas.map((ven) =>
+                            {ventasFiltradas.map((ven) =>
                                 ven.detalles_ventas?.length > 0
                                     ? ven.detalles_ventas.map((detalle, index) => (
                                         <tr key={`${ven.id_venta}-${detalle.id_detalles_venta}`}>
@@ -292,9 +311,9 @@ export function PaginaVentas() {
                                             {index === 0 && (
                                                 <td rowSpan={ven.detalles_ventas.length}>
                                                     <div className="acciones-tabla">
-                                                        <button className="btn-icono btn-icono-editar" onClick={() => abrirModalEditar(ven.id_venta)}>
+                                                        {/* <button className="btn-icono btn-icono-editar" onClick={() => abrirModalEditar(ven.id_venta)}>
                                                             Editar
-                                                        </button>
+                                                        </button> */}
                                                     </div>
                                                 </td>
                                             )}
@@ -313,9 +332,9 @@ export function PaginaVentas() {
                                             <td colSpan={3} style={{ color: 'var(--color-text-muted)' }}>Sin detalles</td>
                                             <td>
                                                 <div className="acciones-tabla">
-                                                    <button className="btn-icono btn-icono-editar" onClick={() => abrirModalEditar(ven.id_venta)}>
+                                                    {/* <button className="btn-icono btn-icono-editar" onClick={() => abrirModalEditar(ven.id_venta)}>
                                                         ✏️ Editar
-                                                    </button>
+                                                    </button> */}
                                                 </div>
                                             </td>
                                         </tr>
@@ -325,7 +344,7 @@ export function PaginaVentas() {
                     </table>
                 </div>
             )}
-
+    
             <Modal
                 isOpen={modalAbierto}
                 onCancelar={cerrarModal}
