@@ -48,6 +48,7 @@ export async function login(req, res) {
                 apellido: usuario.apellido_personal,
                 telefono: usuario.telefono_personal,
                 correo: usuario.correo_personal??'------------',
+                id_sucursal: sucursalLogin || null,
                 sucursal : nombreSucursal,
                 rol: usuario.nombre_rol,
                 permisos: usuario.permisos,

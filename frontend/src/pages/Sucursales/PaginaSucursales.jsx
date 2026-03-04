@@ -119,6 +119,10 @@ export function PaginaSucursales() {
                         </div>
 
                         <div className="tarjeta-dato">
+                            <span className="etiqueta">ID:</span>
+                            <span>{suc.id_sucursal || "Sin ID"}</span>
+                        </div>
+                        <div className="tarjeta-dato">
                             <span className="etiqueta">Ubicación:</span>
                             <span>{suc.ubicacion_suc || "Sin ubicación"}</span>
                         </div>

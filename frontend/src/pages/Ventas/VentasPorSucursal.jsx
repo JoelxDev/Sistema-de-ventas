@@ -1,6 +1,5 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { obtenerVentasFiltradas } from "../../api/ApiVentas/ApiVentas";
-import { obtenerSucursalesActivas } from "../../api/ApiSucursales/ApiSucursales";
 import { FormularioVentas } from "./FormularioVentas";
 import { useAutenticacion } from "../../context/AutenticacionContext";
 import { useToast } from "../../context/ToastContext";
@@ -19,39 +18,42 @@ function obtenerFechaLocal(diasAtras = 0) {
 const HOY = obtenerFechaLocal(0);
 const AYER = obtenerFechaLocal(1);
 
-const FILTROS_INICIALES = {
-    tipo_venta: '',
-    metodo_pago: '',
-    fecha_desde: HOY,
-    fecha_hasta: HOY,
-    producto: '',
-    id_sucursal: '',
-};
+export function VentasPorSucursal() {
+    const { usuario, tienePermiso } = useAutenticacion();
+    const toast = useToast();
 
-export function PaginaVentas() {
+    const idSucursal = usuario?.id_sucursal;
+    const nombreSucursal = usuario?.sucursal;
+
+    const FILTROS_INICIALES = {
+        tipo_venta: '',
+        metodo_pago: '',
+        fecha_desde: HOY,
+        fecha_hasta: HOY,
+        producto: '',
+        id_sucursal: idSucursal || '',
+    };
+
     const [ventas, setVentas] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
-    const [sucursales, setSucursales] = useState([]);
     const [filtros, setFiltros] = useState(FILTROS_INICIALES);
     const [filtrosAplicados, setFiltrosAplicados] = useState(false);
     const [etiquetaFecha, setEtiquetaFecha] = useState('hoy');
 
-    const { tienePermiso } = useAutenticacion();
-    const toast = useToast();
     const [modalAbierto, setModalAbierto] = useState(false);
     const [idEditar, setIdEditar] = useState(null);
 
-    useEffect(() => { cargarSucursalesActivas(); }, []);
     useEffect(() => { cargarVentasDelDia(); }, []);
 
     async function cargarVentasDelDia() {
+        if (!idSucursal) return;
         try {
             setCargando(true);
             setError(null);
 
-            // Intentar cargar ventas de hoy
-            const ventasHoy = await obtenerVentasFiltradas({ fecha_desde: HOY, fecha_hasta: HOY });
+            // Intentar cargar ventas de hoy para esta sucursal
+            const ventasHoy = await obtenerVentasFiltradas({ fecha_desde: HOY, fecha_hasta: HOY, id_sucursal: idSucursal });
             if (ventasHoy.length > 0) {
                 setVentas(ventasHoy);
                 setEtiquetaFecha('hoy');
@@ -61,7 +63,7 @@ export function PaginaVentas() {
             }
 
             // Si no hay ventas hoy, intentar con ayer
-            const ventasAyer = await obtenerVentasFiltradas({ fecha_desde: AYER, fecha_hasta: AYER });
+            const ventasAyer = await obtenerVentasFiltradas({ fecha_desde: AYER, fecha_hasta: AYER, id_sucursal: idSucursal });
             if (ventasAyer.length > 0) {
                 setVentas(ventasAyer);
                 setEtiquetaFecha('ayer');
@@ -83,21 +85,17 @@ export function PaginaVentas() {
         }
     }
 
-    async function cargarSucursalesActivas() {
-        try { setSucursales(await obtenerSucursalesActivas()); }
-        catch (err) { setError(err.message); }
-    }
-
     async function aplicarFiltros(e) {
         e.preventDefault();
-        // Verificar si hay al menos un filtro activo
-        const hayFiltros = Object.values(filtros).some(v => v !== '');
+        const { tipo_venta, metodo_pago, fecha_desde, fecha_hasta, producto } = filtros;
+        const hayFiltros = [tipo_venta, metodo_pago, fecha_desde, fecha_hasta, producto].some(v => v !== '');
         if (!hayFiltros) { cargarVentasDelDia(); return; }
 
         try {
             setCargando(true);
             setError(null);
-            const resultado = await obtenerVentasFiltradas(filtros);
+            // Siempre forzar id_sucursal del usuario
+            const resultado = await obtenerVentasFiltradas({ ...filtros, id_sucursal: idSucursal });
             setVentas(resultado);
             setEtiquetaFecha(null);
             setFiltrosAplicados(true);
@@ -126,13 +124,14 @@ export function PaginaVentas() {
         toast.exito(idEditar ? "Venta actualizada correctamente" : "Venta registrada correctamente");
     }
 
+    if (!idSucursal) return <div className="estado-error">⚠️ No tienes una sucursal asignada.</div>;
     if (error) return <div className="estado-error">⚠️ Error: {error}</div>;
 
     return (
         <div className="pagina">
             <div className="pagina-header">
                 <h1 className="pagina-titulo">
-                    Historial de Ventas
+                    Historial de Ventas — {nombreSucursal || 'Mi Sucursal'}
                     {etiquetaFecha && (
                         <span style={{ fontSize: '0.55em', fontWeight: 400, color: 'var(--color-text-muted)', marginLeft: '10px' }}>
                             — Mostrando ventas de {etiquetaFecha === 'hoy' ? 'hoy' : 'ayer'} ({etiquetaFecha === 'hoy' ? HOY : AYER})
@@ -146,7 +145,7 @@ export function PaginaVentas() {
                 )}
             </div>
 
-            {/* Barra de filtros */}
+            {/* Barra de filtros (sin selector de sucursal) */}
             <form className="filtros-bar" onSubmit={aplicarFiltros} style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'flex-end', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Tipo</label>
@@ -208,22 +207,6 @@ export function PaginaVentas() {
                     />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Sucursal</label>
-                    <select
-                        className="input"
-                        value={filtros.id_sucursal}
-                        onChange={(e) => actualizarFiltro('id_sucursal', e.target.value)}
-                    >
-                        <option value="">Todas</option>
-                        {sucursales.map((suc) => (
-                            <option key={suc.id_sucursal} value={suc.id_sucursal}>
-                                {suc.nombre_suc}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
                 <button type="submit" className="btn btn-primario" style={{ height: 'fit-content' }}>
                     🔍 Filtrar
                 </button>
@@ -249,7 +232,6 @@ export function PaginaVentas() {
                                 <th>Monto Rec.</th>
                                 <th>Vuelto</th>
                                 <th>Personal</th>
-                                <th>Sucursal</th>
                                 <th>Producto</th>
                                 <th>Precio U.</th>
                                 <th>Cant.</th>
@@ -259,7 +241,7 @@ export function PaginaVentas() {
                         <tbody>
                             {ventas.length === 0 && (
                                 <tr>
-                                    <td colSpan="12" style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '32px' }}>
+                                    <td colSpan="11" style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '32px' }}>
                                         No hay ventas {filtrosAplicados ? 'que coincidan con los filtros' : 'registradas'}.
                                     </td>
                                 </tr>
@@ -283,7 +265,6 @@ export function PaginaVentas() {
                                                     <td rowSpan={ven.detalles_ventas.length}>{formatearMoneda(ven.monto_recivido)}</td>
                                                     <td rowSpan={ven.detalles_ventas.length}>{formatearMoneda(ven.vuelto)}</td>
                                                     <td rowSpan={ven.detalles_ventas.length}>{ven.vendedor?.nombre_completo}</td>
-                                                    <td rowSpan={ven.detalles_ventas.length}>{ven.vendedor?.sucursal}</td>
                                                 </>
                                             )}
                                             <td>{detalle.producto?.nombre_prod ?? 'Sin producto'}</td>
@@ -309,7 +290,6 @@ export function PaginaVentas() {
                                             <td>{formatearMoneda(ven.monto_recivido)}</td>
                                             <td>{formatearMoneda(ven.vuelto)}</td>
                                             <td>{ven.vendedor?.nombre_completo}</td>
-                                            <td>{ven.vendedor?.sucursal}</td>
                                             <td colSpan={3} style={{ color: 'var(--color-text-muted)' }}>Sin detalles</td>
                                             <td>
                                                 <div className="acciones-tabla">
