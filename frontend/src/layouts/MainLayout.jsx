@@ -2,10 +2,11 @@ import { Outlet } from 'react-router-dom';
 import { MenuLateral } from '../components/MenuLateral';
 import { useAutenticacion } from '../context/AutenticacionContext';
 import { useInactividad } from '../hooks/inactividadHook';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 export function MainLayout() {
   const { logout } = useAutenticacion();
+  const [sidebarAbierto, setSidebarAbierto] = useState(false);
 
   const manejarInactividad = useCallback(() => {
     logout();
@@ -16,8 +17,23 @@ export function MainLayout() {
 
   return (
     <div className="layout-root">
-      <MenuLateral />
+      <MenuLateral
+        isOpen={sidebarAbierto}
+        onClose={() => setSidebarAbierto(false)}
+      />
+
       <main className="layout-main">
+        {/* Botón hamburguesa visible solo en móvil */}
+        <button
+          className="btn-hamburguesa"
+          onClick={() => setSidebarAbierto(true)}
+          aria-label="Abrir menú"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
         <Outlet />
       </main>
     </div>

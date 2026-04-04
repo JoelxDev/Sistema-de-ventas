@@ -13,56 +13,73 @@ const NAV_ITEMS = [
   { to: '/ventas', label: 'Ventas', icon: '🛒', modulo: 'ventas' },
 ];
 
-export function MenuLateral() {
+export function MenuLateral({ isOpen = false, onClose }) {
   const { tieneAccesoModulo, logout, usuario } = useAutenticacion();
 
   if (!usuario) return null;
 
+  const handleNavClick = () => {
+    if (onClose) onClose();
+  };
+
   return (
-    <aside className="sidebar">
-      {/* Marca */}
-      <div className="sidebar-brand">
-        <span className="sidebar-brand-icon">👤</span>
-        <span>
-          {
-            usuario.sucursal
-            ?? (usuario.rol === 'Administrador' ? 'Administrador' : usuario.rol)
-          }
-        </span>
-      </div>
+    <>
+      {/* Overlay para cerrar en móvil */}
+      {isOpen && (
+        <div className="sidebar-overlay" onClick={onClose} aria-hidden="true" />
+      )}
 
-      {/* Navegación */}
-      <ul className="sidebar-nav">
-        {NAV_ITEMS.map(({ to, label, icon, modulo }) => {
-          if (modulo && !tieneAccesoModulo(modulo)) return null;
-          return (
-            <li key={to}>
-              <NavLink
-                to={to}
-                className={({ isActive }) =>
-                  'sidebar-link' + (isActive ? ' active' : '')
-                }
-              >
-                <span className="sidebar-link-icon">{icon}</span>
-                <span>{label}</span>
-              </NavLink>
-            </li>
-          );
-        })}
-      </ul>
-
-      {/* Footer */}
-      <div className="sidebar-footer">
-        {usuario && (
-          <div style={{ marginBottom: '10px', color: '#94a3b8', fontSize: '0.78rem', textAlign: 'center' }}>
-            {usuario.nombre_usuario}
-          </div>
-        )}
-        <button className="btn-logout" onClick={logout}>
-          <span>🚪</span>
-          <span>Cerrar sesión</span>
+      <aside className={`sidebar${isOpen ? ' sidebar-abierto' : ''}`}>
+        {/* Botón de cerrar en móvil */}
+        <button className="sidebar-close" onClick={onClose} aria-label="Cerrar menú">
+          ✕
         </button>
-      </div>
-    </aside>
+
+        {/* Marca */}
+        <div className="sidebar-brand">
+          <span className="sidebar-brand-icon">👤</span>
+          <span>
+            {
+              usuario.sucursal
+              ?? (usuario.rol === 'Administrador' ? 'Administrador' : usuario.rol)
+            }
+          </span>
+        </div>
+
+        {/* Navegación */}
+        <ul className="sidebar-nav">
+          {NAV_ITEMS.map(({ to, label, icon, modulo }) => {
+            if (modulo && !tieneAccesoModulo(modulo)) return null;
+            return (
+              <li key={to}>
+                <NavLink
+                  to={to}
+                  className={({ isActive }) =>
+                    'sidebar-link' + (isActive ? ' active' : '')
+                  }
+                  onClick={handleNavClick}
+                >
+                  <span className="sidebar-link-icon">{icon}</span>
+                  <span>{label}</span>
+                </NavLink>
+              </li>
+            );
+          })}
+        </ul>
+
+        {/* Footer */}
+        <div className="sidebar-footer">
+          {usuario && (
+            <div style={{ marginBottom: '10px', color: '#94a3b8', fontSize: '0.78rem', textAlign: 'center' }}>
+              {usuario.nombre_usuario}
+            </div>
+          )}
+          <button className="btn-logout" onClick={logout}>
+            <span>🚪</span>
+            <span>Cerrar sesión</span>
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }

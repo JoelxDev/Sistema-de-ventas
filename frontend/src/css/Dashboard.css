@@ -201,6 +201,44 @@
 }
 
 @media (max-width: 480px) {
+    .dashboard-titulo {
+        font-size: 1.3rem;
+        margin-bottom: 16px;
+    }
+
+    .dashboard-tarjetas {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .tarjeta-resumen {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .tarjeta-icono {
+        font-size: 1.5rem;
+    }
+
+    .tarjeta-valor {
+        font-size: 1rem;
+    }
+
+    .tarjeta-etiqueta {
+        font-size: 0.72rem;
+    }
+
+    .periodo-selector {
+        flex-wrap: wrap;
+    }
+
+    .btn-periodo {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
     .dashboard-tarjetas {
         grid-template-columns: 1fr;
     }

@@ -146,76 +146,79 @@ export function VentasPorSucursal() {
             </div>
 
             {/* Barra de filtros (sin selector de sucursal) */}
-            <form className="filtros-bar" onSubmit={aplicarFiltros} style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'flex-end', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Tipo</label>
-                    <select
-                        className="input"
-                        value={filtros.tipo_venta}
-                        onChange={(e) => actualizarFiltro('tipo_venta', e.target.value)}
-                    >
-                        <option value="">Todos</option>
-                        <option value="unica">Unica</option>
-                        <option value="multiple">Multiple</option>
-                    </select>
+            <form className="filtros-ventas" onSubmit={aplicarFiltros}>
+                <div className="ventas-filtros-grid">
+                    <div className="filtro-campo">
+                        <label>Tipo</label>
+                        <select
+                            className="input"
+                            value={filtros.tipo_venta}
+                            onChange={(e) => actualizarFiltro('tipo_venta', e.target.value)}
+                        >
+                            <option value="">Todos</option>
+                            <option value="unica">Única</option>
+                            <option value="multiple">Múltiple</option>
+                        </select>
+                    </div>
+
+                    <div className="filtro-campo">
+                        <label>Método Pago</label>
+                        <select
+                            className="input"
+                            value={filtros.metodo_pago}
+                            onChange={(e) => actualizarFiltro('metodo_pago', e.target.value)}
+                        >
+                            <option value="">Todos</option>
+                            <option value="efectivo">Efectivo</option>
+                            <option value="tarjeta">Tarjeta</option>
+                            <option value="yape">Yape</option>
+                            <option value="plin">Plin</option>
+                            <option value="transferencia">Transferencia</option>
+                        </select>
+                    </div>
+
+                    <div className="filtro-campo">
+                        <label>Desde</label>
+                        <input
+                            type="date"
+                            className="input"
+                            value={filtros.fecha_desde}
+                            onChange={(e) => actualizarFiltro('fecha_desde', e.target.value)}
+                        />
+                    </div>
+
+                    <div className="filtro-campo">
+                        <label>Hasta</label>
+                        <input
+                            type="date"
+                            className="input"
+                            value={filtros.fecha_hasta}
+                            onChange={(e) => actualizarFiltro('fecha_hasta', e.target.value)}
+                        />
+                    </div>
+
+                    <div className="filtro-campo">
+                        <label>Producto</label>
+                        <input
+                            type="text"
+                            className="input"
+                            placeholder="Buscar producto..."
+                            value={filtros.producto}
+                            onChange={(e) => actualizarFiltro('producto', e.target.value)}
+                        />
+                    </div>
+
+                    <div className="ventas-filtros-acciones">
+                        <button type="submit" className="btn btn-primario">
+                            🔍 Filtrar
+                        </button>
+                        {filtrosAplicados && (
+                            <button type="button" className="btn btn-secundario" onClick={limpiarFiltros}>
+                                ✕ Limpiar
+                            </button>
+                        )}
+                    </div>
                 </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Método Pago</label>
-                    <select
-                        className="input"
-                        value={filtros.metodo_pago}
-                        onChange={(e) => actualizarFiltro('metodo_pago', e.target.value)}
-                    >
-                        <option value="">Todos</option>
-                        <option value="efectivo">Efectivo</option>
-                        <option value="tarjeta">Tarjeta</option>
-                        <option value="yape">Yape</option>
-                        <option value="plin">Plin</option>
-                        <option value="transferencia">Transferencia</option>
-                    </select>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Desde</label>
-                    <input
-                        type="date"
-                        className="input"
-                        value={filtros.fecha_desde}
-                        onChange={(e) => actualizarFiltro('fecha_desde', e.target.value)}
-                    />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Hasta</label>
-                    <input
-                        type="date"
-                        className="input"
-                        value={filtros.fecha_hasta}
-                        onChange={(e) => actualizarFiltro('fecha_hasta', e.target.value)}
-                    />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Producto</label>
-                    <input
-                        type="text"
-                        className="input"
-                        placeholder="Buscar producto..."
-                        value={filtros.producto}
-                        onChange={(e) => actualizarFiltro('producto', e.target.value)}
-                    />
-                </div>
-
-                <button type="submit" className="btn btn-primario" style={{ height: 'fit-content' }}>
-                    🔍 Filtrar
-                </button>
-
-                {filtrosAplicados && (
-                    <button type="button" className="btn btn-secundario" onClick={limpiarFiltros} style={{ height: 'fit-content' }}>
-                        ✕ Limpiar
-                    </button>
-                )}
             </form>
 
             {cargando ? (
@@ -310,6 +313,7 @@ export function VentasPorSucursal() {
                 isOpen={modalAbierto}
                 onCancelar={cerrarModal}
                 titulo={idEditar ? "Editar Venta" : "Registrar Venta"}
+                className="modal-lg"
             >
                 <FormularioVentas
                     idVenta={idEditar}

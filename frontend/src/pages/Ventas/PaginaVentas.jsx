@@ -49,6 +49,12 @@ export function PaginaVentas() {
         return ventas.filter(v => v.vendedor?.nombre_completo?.toLowerCase().includes(texto));
     }, [ventas, filtroPersonal]);
 
+    const resumenVentas = useMemo(() => {
+        const cantidad = ventasFiltradas.length;
+        const total = ventasFiltradas.reduce((acc, v) => acc + (parseFloat(v.total_pagar) || 0), 0);
+        return { cantidad, total };
+    }, [ventasFiltradas]);
+
     useEffect(() => { cargarSucursalesActivas(); }, []);
     useEffect(() => { cargarVentasDelDia(); }, []);
 
@@ -155,108 +161,156 @@ export function PaginaVentas() {
             </div>
 
             {/* Barra de filtros */}
-            <form className="filtros-bar" onSubmit={aplicarFiltros} style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'flex-end', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Tipo</label>
-                    <select
-                        className="input"
-                        value={filtros.tipo_venta}
-                        onChange={(e) => actualizarFiltro('tipo_venta', e.target.value)}
-                    >
-                        <option value="">Todos</option>
-                        <option value="unica">Unica</option>
-                        <option value="multiple">Multiple</option>
-                    </select>
+            <form className="filtros-ventas" onSubmit={aplicarFiltros}>
+                <div className="ventas-filtros-grid">
+                    <div className="filtro-campo">
+                        <label>Tipo</label>
+                        <select
+                            className="input"
+                            value={filtros.tipo_venta}
+                            onChange={(e) => actualizarFiltro('tipo_venta', e.target.value)}
+                        >
+                            <option value="">Todos</option>
+                            <option value="unica">Única</option>
+                            <option value="multiple">Múltiple</option>
+                        </select>
+                    </div>
+
+                    <div className="filtro-campo">
+                        <label>Método Pago</label>
+                        <select
+                            className="input"
+                            value={filtros.metodo_pago}
+                            onChange={(e) => actualizarFiltro('metodo_pago', e.target.value)}
+                        >
+                            <option value="">Todos</option>
+                            <option value="efectivo">Efectivo</option>
+                            <option value="tarjeta">Tarjeta</option>
+                            <option value="yape">Yape</option>
+                            <option value="plin">Plin</option>
+                            <option value="transferencia">Transferencia</option>
+                        </select>
+                    </div>
+
+                    <div className="filtro-campo">
+                        <label>Desde</label>
+                        <input
+                            type="date"
+                            className="input"
+                            value={filtros.fecha_desde}
+                            onChange={(e) => actualizarFiltro('fecha_desde', e.target.value)}
+                        />
+                    </div>
+
+                    <div className="filtro-campo">
+                        <label>Hasta</label>
+                        <input
+                            type="date"
+                            className="input"
+                            value={filtros.fecha_hasta}
+                            onChange={(e) => actualizarFiltro('fecha_hasta', e.target.value)}
+                        />
+                    </div>
+
+                    <div className="filtro-campo">
+                        <label>Producto</label>
+                        <input
+                            type="text"
+                            className="input"
+                            placeholder="Buscar producto..."
+                            value={filtros.producto}
+                            onChange={(e) => actualizarFiltro('producto', e.target.value)}
+                        />
+                    </div>
+
+                    <div className="filtro-campo">
+                        <label>Personal</label>
+                        <input
+                            type="text"
+                            className="input"
+                            placeholder="Buscar personal..."
+                            value={filtroPersonal}
+                            onChange={(e) => setFiltroPersonal(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="filtro-campo">
+                        <label>Sucursal</label>
+                        <select
+                            className="input"
+                            value={filtros.id_sucursal}
+                            onChange={(e) => actualizarFiltro('id_sucursal', e.target.value)}
+                        >
+                            <option value="">Todas</option>
+                            {sucursales.map((suc) => (
+                                <option key={suc.id_sucursal} value={suc.id_sucursal}>
+                                    {suc.nombre_suc}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="ventas-filtros-acciones">
+                        <button type="submit" className="btn btn-primario">
+                            🔍 Filtrar
+                        </button>
+                        {filtrosAplicados && (
+                            <button type="button" className="btn btn-secundario" onClick={limpiarFiltros}>
+                                ✕ Limpiar
+                            </button>
+                        )}
+                    </div>
                 </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Método Pago</label>
-                    <select
-                        className="input"
-                        value={filtros.metodo_pago}
-                        onChange={(e) => actualizarFiltro('metodo_pago', e.target.value)}
-                    >
-                        <option value="">Todos</option>
-                        <option value="efectivo">Efectivo</option>
-                        <option value="tarjeta">Tarjeta</option>
-                        <option value="yape">Yape</option>
-                        <option value="plin">Plin</option>
-                        <option value="transferencia">Transferencia</option>
-                    </select>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Desde</label>
-                    <input
-                        type="date"
-                        className="input"
-                        value={filtros.fecha_desde}
-                        onChange={(e) => actualizarFiltro('fecha_desde', e.target.value)}
-                    />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Hasta</label>
-                    <input
-                        type="date"
-                        className="input"
-                        value={filtros.fecha_hasta}
-                        onChange={(e) => actualizarFiltro('fecha_hasta', e.target.value)}
-                    />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Producto</label>
-                    <input
-                        type="text"
-                        className="input"
-                        placeholder="Buscar producto..."
-                        value={filtros.producto}
-                        onChange={(e) => actualizarFiltro('producto', e.target.value)}
-                    />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Personal</label>
-                    <input
-                        type="text"
-                        className="input"
-                        placeholder="Buscar personal..."
-                        value={filtroPersonal}
-                        onChange={(e) => setFiltroPersonal(e.target.value)}
-                    />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Sucursal</label>
-                    <select
-                        className="input"
-                        value={filtros.id_sucursal}
-                        onChange={(e) => actualizarFiltro('id_sucursal', e.target.value)}
-                    >
-                        <option value="">Todas</option>
-                        {sucursales.map((suc) => (
-                            <option key={suc.id_sucursal} value={suc.id_sucursal}>
-                                {suc.nombre_suc}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <button type="submit" className="btn btn-primario" style={{ height: 'fit-content' }}>
-                    🔍 Filtrar
-                </button>
-
-                {filtrosAplicados && (
-                    <button type="button" className="btn btn-secundario" onClick={limpiarFiltros} style={{ height: 'fit-content' }}>
-                        ✕ Limpiar
-                    </button>
-                )}
             </form>
 
             {cargando ? (
                 <div className="estado-cargando">⏳ Cargando ventas...</div>
             ) : (
+                <>
+                <div style={{
+                    display: 'flex',
+                    gap: '16px',
+                    marginBottom: '16px',
+                    flexWrap: 'wrap'
+                }}>
+                    <div style={{
+                        flex: '1 1 200px',
+                        background: 'var(--color-primary-light, #e8f0fe)',
+                        borderLeft: '4px solid var(--color-primary, #3b82f6)',
+                        borderRadius: '8px',
+                        padding: '16px 20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px'
+                    }}>
+                        <span style={{ fontSize: '1.6rem' }}>🧾</span>
+                        <div>
+                            <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginBottom: '2px' }}>Ventas registradas</div>
+                            <div style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--color-primary-dark, #1a3b5c)' }}>
+                                {resumenVentas.cantidad}
+                            </div>
+                        </div>
+                    </div>
+                    <div style={{
+                        flex: '1 1 200px',
+                        background: 'var(--color-success-light, #d1fae5)',
+                        borderLeft: '4px solid var(--color-success, #10b981)',
+                        borderRadius: '8px',
+                        padding: '16px 20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px'
+                    }}>
+                        <span style={{ fontSize: '1.6rem' }}>💰</span>
+                        <div>
+                            <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginBottom: '2px' }}>Total recaudado</div>
+                            <div style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--color-success-dark, #065f46)' }}>
+                                {formatearMoneda(resumenVentas.total)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="tabla-wrapper">
                     <table className="tabla">
                         <thead>
@@ -343,12 +397,14 @@ export function PaginaVentas() {
                         </tbody>
                     </table>
                 </div>
+                </>
             )}
     
             <Modal
                 isOpen={modalAbierto}
                 onCancelar={cerrarModal}
                 titulo={idEditar ? "Editar Venta" : "Registrar Venta"}
+                className="modal-lg"
             >
                 <FormularioVentas
                     idVenta={idEditar}

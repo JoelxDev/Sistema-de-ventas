@@ -59,7 +59,7 @@ export function FormularioCategoria({idCategoria, onGuardar, onCancelar}) {
       {error && <p style={{ color: "red" }}>{error}</p>}
       
       <div style={{ marginBottom: "15px" }}>
-        <label>Nombre Modulo</label><br />
+        <label>Nombre Categoria</label><br />
         <input
           type="text"
           name="nombre_categoria"
@@ -67,7 +67,7 @@ export function FormularioCategoria({idCategoria, onGuardar, onCancelar}) {
           onChange={manejarCambio}
           required
         />
-      </div>
+      </div>                                                                                                                                                                             
       
       <div style={{ marginBottom: "15px" }}>
         <label>Descripcion</label><br />
@@ -85,7 +85,7 @@ export function FormularioCategoria({idCategoria, onGuardar, onCancelar}) {
           Cancelar
         </button>
         <button type="submit">
-          {idCategoria ? "Guardar cambios" : "Aniador Categoria"}
+          {idCategoria ? "Guardar cambios" : "Añadir Categoria"}
         </button>
       </div>
     </form>
