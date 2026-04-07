@@ -1,10 +1,16 @@
 import * as VentasModel from './ventas.model.js';
+import { insertarMovimiento, TIPOS_MOVIMIENTO } from '../movimientos/movimientos.model.js';
+import { obtenerUsuarioPorId } from '../usuarios/usuarios.model.js';
 
 export async function crearVenta(req, res) {
     try {
-        const { idUsuarioSucursal } = req.usuario;
-        // if ()
+        const usuario = await obtenerUsuarioPorId(req.usuario.id);
+        if (!usuario) {
+            return res.status(404).json({ mensaje: "Usuario no encontrado" });
+        }
+        const { idUsuarioSucursal } = req.usuario;        
         const idVenta = await VentasModel.crearVenta(req.body, idUsuarioSucursal);
+        await insertarMovimiento(TIPOS_MOVIMIENTO.CREACION, 'Nueva venta creada por usuario: ' + usuario.nombre_usuario, req.usuario.id); // Registramos el movimiento de creación de venta
         res.status(201).json({ id: idVenta, mensaje: "Venta creada exitosamente" });
     } catch (error) {
         console.error("❌ Error al crear venta:", error);
@@ -50,7 +56,12 @@ export async function obtenerVentasFiltradas(req, res) {
             id_sucursal: req.query.id_sucursal || null,
         };
 
+        // const usuario = await obtenerUsuarioPorId(req.usuario.id);
+        if (!usuario) {
+            return res.status(404).json({ mensaje: "Usuario no encontrado" });
+        }
         const ventas = await VentasModel.obtenerVentasFiltradas(filtros);
+        // await insertarMovimiento(TIPOS_MOVIMIENTO.CONSULTA, 'Consulta de ventas con filtros: ' + JSON.stringify(filtros), req.usuario.id); // Registramos el movimiento de consulta de ventas con los filtros aplicados
         res.status(200).json(ventas);
     } catch (error) {
         console.error("❌ Error al filtrar ventas:", error);

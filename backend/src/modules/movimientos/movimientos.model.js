@@ -1,6 +1,7 @@
 import pool from '../../config/conexion_bd.js';
 
 export const TIPOS_MOVIMIENTO = {
+    CONSULTA: 'Consulta',
     CREACION: 'Creación',
     EDICION: 'Edición',
     ELIMINACION: 'Eliminación',

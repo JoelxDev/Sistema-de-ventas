@@ -21,6 +21,13 @@ export async function obtenerPersonalPorId(id) {
     return rows[0];
 }
 
+export async function obtenerUsuarioPorId(idUsuario) {
+    const [rows] = await pool.query(
+        `SELECT * FROM usuarios WHERE id_usuario = ?`, [idUsuario]
+    );
+    return rows[0];
+}
+
 export async function crearPersonal(datos) {
     const { nombre_per, apellido_per, dni_per, telefono_per, correo_elect_per, roles_id_rol } = datos;
     const connection = await pool.getConnection();
