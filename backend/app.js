@@ -16,6 +16,7 @@ import categoriasRoutes from './src/modules/categorias/categorias.routes.js';
 import produtosRoutes from './src/modules/productos/productos.routes.js';
 import ventasRoutes from './src/modules/ventas/ventas.routes.js';
 import dashboardRoutes from './src/modules/dashboard/dashboard.routes.js';
+import movimientosRoutes from './src/modules/movimientos/movimientos.routers.js';
 // ============================================================
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use('/api/categorias', categoriasRoutes);
 app.use('/api/productos', produtosRoutes);
 app.use('/api/ventas', ventasRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/movimientos', movimientosRoutes);
 // =============================================================
 
 app.get('/', (req, res) => {

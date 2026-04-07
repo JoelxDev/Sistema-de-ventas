@@ -13,7 +13,7 @@ export async function obtenerTodosLosPersonales() {
 
 export async function obtenerPersonalPorId(id) {
     const [rows] = await pool.query(
-        `SELECT p.*, u.roles_id_rol 
+        `SELECT p.*, u.roles_id_rol, u.nombre_usuario, u.estado_usuario
         FROM personal p
         LEFT JOIN usuarios u ON u.personal_id_personal = p.id_personal
         WHERE p.id_personal = ?`, [id]
@@ -65,7 +65,7 @@ export async function crearPersonal(datos) {
         return {
             id_personal: idPersonal,
             nombre_usuario: nombreUsuario,
-            contrasenia_temporal: contraseniaPlana
+            // contrasenia_temporal: contraseniaPlana
         }
     } catch(error){
         await connection.rollback();
@@ -90,6 +90,8 @@ export async function actualizarPersonal(id, datos) {
             'UPDATE usuarios SET roles_id_rol = ? WHERE personal_id_personal = ?',
             [roles_id_rol, id]
         );
+
+        await connection.commit();
 
     }catch (error) {
         await connection.rollback();
