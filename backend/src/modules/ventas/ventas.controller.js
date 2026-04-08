@@ -10,6 +10,7 @@ export async function crearVenta(req, res) {
         }
         const { idUsuarioSucursal } = req.usuario;        
         const idVenta = await VentasModel.crearVenta(req.body, idUsuarioSucursal);
+        // Aun no se que poner para el detalle de la venta, asi que por ahora solo pongo el nombre del usuario que creo la venta, pero se puede mejorar para incluir mas detalles de la venta
         await insertarMovimiento(TIPOS_MOVIMIENTO.CREACION, 'Nueva venta creada por usuario: ' + usuario.nombre_usuario, req.usuario.id); // Registramos el movimiento de creación de venta
         res.status(201).json({ id: idVenta, mensaje: "Venta creada exitosamente" });
     } catch (error) {
@@ -57,9 +58,9 @@ export async function obtenerVentasFiltradas(req, res) {
         };
 
         // const usuario = await obtenerUsuarioPorId(req.usuario.id);
-        if (!usuario) {
-            return res.status(404).json({ mensaje: "Usuario no encontrado" });
-        }
+        // if (!usuario) {
+        //     return res.status(404).json({ mensaje: "Usuario no encontrado" });
+        // }
         const ventas = await VentasModel.obtenerVentasFiltradas(filtros);
         // await insertarMovimiento(TIPOS_MOVIMIENTO.CONSULTA, 'Consulta de ventas con filtros: ' + JSON.stringify(filtros), req.usuario.id); // Registramos el movimiento de consulta de ventas con los filtros aplicados
         res.status(200).json(ventas);
