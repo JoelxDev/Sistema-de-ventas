@@ -31,6 +31,7 @@ export async function actualizarRol(id, datos) {
         body: JSON.stringify(datos),
     });
     if (!response.ok) throw new Error('Error al actualizar rol')
+    console.log('Respuesta de la API:', 'ID: ', JSON.stringify(id), 'Datos: ', JSON.stringify(datos));
     return response.json();
 }
 
@@ -39,8 +40,9 @@ export async function eliminarRol(id) {
         method: 'DELETE',
         credentials: 'include',
     });
-    if (!response.ok) throw new Error('Error al eliminar rol')
-    return response.json();
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.mensaje || 'Error al eliminar rol')
+    return data;
 }
 
 export async function actualizarEstadoRol(id, estado) {

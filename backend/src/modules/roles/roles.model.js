@@ -84,10 +84,33 @@ export async function actualizarRol(id, datos) {
 }
 
 export async function eliminarRol(id) {
-    const [result] = await pool.query(
-        'DELETE FROM roles WHERE id_rol = ?', [id]
-    );
-    return result.affectedRows;
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        const [usuarios] = await connection.query(
+            'SELECT id_usuario FROM usuarios WHERE roles_id_rol = ?', [id]
+        );
+        if (usuarios.length > 0) {
+            throw new Error(`No se puede eliminar el rol porque tiene ${usuarios.length} usuario(s) asignado(s). Reasigna o elimina esos usuarios primero.`);
+        }
+
+        await connection.query(
+            'DELETE FROM roles_y_permisos WHERE roles_id_rol = ?', [id]
+        );
+
+        const [result] = await connection.query(
+            'DELETE FROM roles WHERE id_rol = ?', [id]
+        );
+
+        await connection.commit();
+        return result.affectedRows;
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
 }
 
 export async function actualizarEstadoRol(id, estado) {
@@ -104,4 +127,23 @@ export async function actualizarRequiereSucursal(id, requireSucursal) {
         [requireSucursal, id]
     );
     return result.affectedRows;
+}
+
+export async function obtenerPermisos(idPermisos) {
+    const [rows] = await pool.query(
+        `SELECT p.nombre_perm, m.nombre_modulo FROM permisos p
+         JOIN modulos m ON p.modulos_id_modulo = m.id_modulo
+         WHERE p.id_permiso IN (?)`,
+        [idPermisos]
+    );
+    // transformamos a un objeto { modulo: [permiso1, permiso2, ...] }
+    const permisosPorModulo = {};
+    rows.forEach(row => {
+        if (!permisosPorModulo[row.nombre_modulo]) {
+            permisosPorModulo[row.nombre_modulo] = [];
+        }
+        permisosPorModulo[row.nombre_modulo].push(row.nombre_perm);
+    });
+    return permisosPorModulo;
+
 }
