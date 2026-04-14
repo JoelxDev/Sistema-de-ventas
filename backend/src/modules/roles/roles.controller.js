@@ -54,7 +54,7 @@ export async function actualizarRol(req, res) {
 
         const permisosAnteriores = cuerpoAnterior.permisos; // [4, 5, 6, 1]
         const permisosEnviados = req.body.permisos; // [4, 5, 6, 2]
-
+        // AUN NO SE INSERTA EN LA BASE DE DATOS, FALTA ANALISAR EL COMO MOSTRAR AL USUARIO LOS CAMBIOS REALIZADOS DE MANERA LEGIBLE, POR AHORA SE MUESTRA EN CONSOLA PARA VERIFICAR QUE SE DETECTAN CORRECTAMENTE LOS CAMBIOS EN LOS PERMISOS
         for (const valPropiedad in req.body) {
             if (cuerpoAnterior[valPropiedad] !== req.body[valPropiedad]) {
                 console.log(`Valor cambiado para ${valPropiedad}: ${cuerpoAnterior[valPropiedad]} -> ${req.body[valPropiedad]}`);
