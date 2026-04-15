@@ -8,10 +8,10 @@ export const TIPOS_MOVIMIENTO = {
     ACTUALIZACION_ESTADO: 'Actualización de estado'
 };
 
-export async function insertarMovimiento(movimiento, detalles, idUsuario) {
+export async function insertarMovimiento(movimiento, detalles, nombreUsuario) {
     const [result] = await pool.query(
-        'INSERT INTO movimientos_usuarios (movimiento, detalles_movimiento, fecha_movimiento, usuarios_id_usuario) VALUES (?, ?, NOW(), ?)',
-        [movimiento, detalles, idUsuario]
+        'INSERT INTO movimientos_usuarios (movimiento, detalles_movimiento, fecha_movimiento, nombre_usuario) VALUES (?, ?, NOW(), ?)',
+        [movimiento, detalles, nombreUsuario]
     );
     return result.insertId;
 
